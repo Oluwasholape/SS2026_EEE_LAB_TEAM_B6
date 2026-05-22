@@ -1,2 +1,11 @@
-# SS2026_EEE_LAB_TEAM_B6
-Cross-traffic intersection management system for autonomous vehicles, modeled with queuing theory and UPPAAL, implemented in C with freeRTOS. HSHL Embedded Electronic Engineering Lab.
+# SS2026_EEE_Lab_Team_B6
+
+Embedded Electronic Engineering Lab - SS2026
+Real Time Systems/Hardware Software Codesign
+Hochschule Hamm-Lippstadt
+
+## Team Members
+- Boiddo, Sumon
+- Ferdous, Soaib
+- Nnachi-Egwu, Nnaemeka
+- Oyemade, Oluwasholape Daniel
