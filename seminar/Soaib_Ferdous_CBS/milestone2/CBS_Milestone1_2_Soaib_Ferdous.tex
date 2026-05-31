@@ -1,0 +1,507 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Constant Bandwidth Server:\\Technical Briefing and Scientific Contextualization\\
+{\footnotesize Milestones 1 \& 2 --- Real-Time Systems Seminar, HSHL}}
+
+\author{\IEEEauthorblockN{Soaib Ferdous}
+\IEEEauthorblockA{\textit{Department of Electronic Engineering} \\
+\textit{Hochschule Hamm-Lippstadt}\\
+Student ID: 1232368 \\
+Group B, Team 6}}
+
+\maketitle
+
+\begin{abstract}
+This document covers Milestones 1 and 2 for the seminar topic
+\emph{Constant Bandwidth Server} (CBS).
+Milestone 1 provides a structured technical briefing: problem setting,
+formal definition, scheduling algorithm, assumptions, runtime overhead,
+and open questions.
+Milestone 2 places CBS in the landscape of aperiodic server algorithms,
+compares it with related approaches (PS, DS, SS, TBS), analyzes
+engineering tradeoffs, and discusses consequences for embedded systems.
+Primary reference: Buttazzo, \textit{Hard Real-Time Computing Systems}.
+\end{abstract}
+
+%%=============================================================
+%% MILESTONE 1
+%%=============================================================
+
+\section*{--- Milestone 1: Technical Understanding ---}
+
+% ============================================================
+\section{Problem Statement and Motivation}
+% ============================================================
+
+\begin{itemize}
+  \item Real-time systems typically mix \emph{periodic} tasks (hard deadlines,
+        known periods) with \emph{aperiodic} tasks (irregular arrivals, often
+        soft deadlines).
+  \item Under fixed-priority schedulers (RM/DM), naive background execution of
+        aperiodic tasks yields poor response times; foreground execution
+        can cause periodic tasks to miss deadlines.
+  \item Earlier server approaches attempt a middle ground:
+        \emph{Polling Server} (PS) wastes budget if no aperiodic job is
+        waiting; \emph{Deferrable Server} (DS) preserves budget but can
+        violate the RM schedulability bound because it behaves like a task with
+        a higher effective utilization at replenishment points.
+  \item \textbf{Core problem:} How can aperiodic tasks be served with low
+        response time \emph{and} with a provable guarantee that periodic task
+        schedulability is not affected?
+  \item CBS answers this under EDF by ensuring the server never increases the
+        processor demand beyond what is implied by its assigned bandwidth
+        $U_s = Q_s / T_s$.
+\end{itemize}
+
+% ============================================================
+\section{Core Technical Contribution}
+% ============================================================
+
+\begin{itemize}
+  \item CBS is a dynamic-priority server designed to work with the
+        \emph{Earliest Deadline First} (EDF) scheduler.
+  \item Key property: \textbf{temporal isolation} --- a misbehaving or
+        overloaded aperiodic task cannot steal CPU time from periodic tasks
+        beyond what the server's bandwidth allows.
+  \item Mechanism: the server has a \emph{current deadline} $d_s$ and a
+        \emph{current budget} $c_s$. The aperiodic job runs only when the
+        server's deadline $d_s$ is the earliest in the system. Budget is
+        consumed during execution. When budget is exhausted, the deadline is
+        postponed and budget is recharged --- the task continues but at a
+        lower effective priority.
+  \item This distinguishes CBS from DS: in DS, the server can retain budget
+        across a period boundary, increasing instantaneous demand. CBS
+        prevents this by its replenishment rule (Section~\ref{sec:algo}).
+\end{itemize}
+
+% ============================================================
+\section{Formal Definition}
+% ============================================================
+
+A CBS is characterized by two parameters:
+\begin{itemize}
+  \item $Q_s$ --- maximum server budget (execution budget per period)
+  \item $T_s$ --- server period
+\end{itemize}
+
+\noindent\textbf{Server bandwidth:}
+\begin{equation}
+  U_s = \frac{Q_s}{T_s}
+  \label{eq:bandwidth}
+\end{equation}
+
+\noindent\textbf{Schedulability condition} (CBS + $n$ periodic EDF tasks):
+\begin{equation}
+  U_s + \sum_{i=1}^{n} \frac{C_i}{T_i} \leq 1
+  \label{eq:sched}
+\end{equation}
+where $C_i$ and $T_i$ are the WCET and period of periodic task $\tau_i$.
+CBS is treated as a periodic task with utilization $U_s$ in the EDF
+schedulability test, which is its central analytical advantage.
+
+\noindent\textbf{Runtime server state:}
+\begin{itemize}
+  \item $c_s$: remaining budget, $0 \leq c_s \leq Q_s$
+  \item $d_s$: current server deadline
+\end{itemize}
+
+% ============================================================
+\section{Algorithm and Budget/Deadline Rules}
+\label{sec:algo}
+% ============================================================
+
+\subsection{Initialization}
+At $t = 0$: $c_s \leftarrow Q_s$, $d_s \leftarrow T_s$.
+
+\subsection{Job Arrival Rule}
+When aperiodic job $J$ arrives at time $t$:
+\begin{itemize}
+  \item \textbf{If} server idle and $c_s \geq (d_s - t) \cdot U_s$:
+        assign current $d_s$ to $J$ (budget is still ``fresh'').
+  \item \textbf{Else:} set $d_s \leftarrow d_s + T_s$,
+        $c_s \leftarrow Q_s$; assign new $d_s$ to $J$.
+  \item \textbf{If} server busy: $J$ is queued (FIFO).
+\end{itemize}
+
+The condition $c_s \geq (d_s - t) \cdot U_s$ prevents using stale budget
+that would cause demand to exceed $U_s$ within the current period.
+
+\subsection{Budget Exhaustion Rule}
+When $c_s = 0$ at time $t$:
+$d_s \leftarrow d_s + T_s$, $c_s \leftarrow Q_s$.
+The job continues with the new (later) $d_s$, reducing its EDF priority.
+
+\begin{algorithm}
+\caption{CBS decisions (simplified)}
+\begin{algorithmic}[1]
+\STATE \textbf{On job arrival} at $t$:
+\IF{server idle \AND $c_s \geq (d_s - t) \cdot U_s$}
+  \STATE assign current $d_s$ to job
+\ELSE
+  \STATE $d_s \leftarrow d_s + T_s$;\ $c_s \leftarrow Q_s$
+  \STATE assign new $d_s$ to job
+\ENDIF
+\STATE \textbf{On budget exhaustion:}
+\STATE $d_s \leftarrow d_s + T_s$;\ $c_s \leftarrow Q_s$
+\STATE job continues with updated $d_s$
+\end{algorithmic}
+\end{algorithm}
+
+% ============================================================
+\section{Assumptions and Scope Limitations}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Scheduler:} EDF required. CBS does not apply to
+        fixed-priority schedulers (RM/DM).
+  \item \textbf{Processor:} Single processor in original formulation.
+  \item \textbf{Preemption:} Fully preemptive model.
+  \item \textbf{Task model:} Periodic tasks with implicit deadlines
+        ($D_i = T_i$), known $C_i$ and $T_i$.
+  \item \textbf{Aperiodic guarantees:} Bandwidth only --- no hard
+        per-job response time guarantee.
+  \item \textbf{No resource sharing:} Priority inversion and shared
+        resources are out of scope in basic CBS.
+\end{itemize}
+
+% ============================================================
+\section{Runtime and Overhead}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Server state update:} $O(1)$ per arrival and per budget
+        exhaustion event.
+  \item \textbf{EDF queue:} $O(\log n)$ insert/update, shared with all
+        tasks.
+  \item \textbf{Timer:} One additional timer interrupt per budget period
+        when server is active.
+  \item \textbf{Memory:} Constant per server: $Q_s$, $T_s$, $c_s$,
+        $d_s$, job queue pointer.
+\end{itemize}
+
+% ============================================================
+\section{Open Questions (Identified at M1)}
+% ============================================================
+
+\begin{enumerate}
+  \item Hard CBS variant: how does the replenishment rule differ?
+  \item Closed-form aperiodic response time bound under CBS?
+  \item Exact distinction between CBS and TBS (addressed in M2).
+  \item Multiple CBS servers on one processor: schedulability
+        generalization?
+  \item UPPAAL modeling: how to represent budget and deadline as
+        clock constraints in a timed automaton?
+\end{enumerate}
+
+%%=============================================================
+%% MILESTONE 2
+%%=============================================================
+
+\section*{--- Milestone 2: Scientific Contextualization ---}
+
+% ============================================================
+\section{Overview of the Aperiodic Server Landscape}
+% ============================================================
+
+CBS belongs to a well-defined line of work on aperiodic task servers,
+developed primarily by Buttazzo and collaborators over the 1990s--2000s.
+The related work is therefore \emph{concentrated}: there is one central
+author group, one formal framework (EDF or RM + server), and one line of
+incremental improvements. This is not a sparse literature by accident ---
+it reflects a mature, self-contained problem class within real-time
+scheduling theory.
+
+The servers divide naturally into two families:
+\begin{itemize}
+  \item \textbf{Fixed-priority family} (work under RM/DM): Polling
+        Server (PS), Deferrable Server (DS), Priority Exchange (PX),
+        Sporadic Server (SS).
+  \item \textbf{Dynamic-priority family} (work under EDF): Total
+        Bandwidth Server (TBS), Constant Bandwidth Server (CBS).
+\end{itemize}
+
+CBS is the most capable server in the dynamic-priority family and
+directly generalizes TBS.
+
+% ============================================================
+\section{Comparison of Aperiodic Server Approaches}
+% ============================================================
+
+Table~\ref{tab:comparison} summarizes the key properties of the main
+aperiodic servers relevant to CBS.
+
+\begin{table*}[t]
+\centering
+\caption{Comparison of Aperiodic Server Approaches}
+\label{tab:comparison}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{2.2cm}|p{1.8cm}|p{2.0cm}|p{2.5cm}|p{2.5cm}|p{2.8cm}|}
+\hline
+\textbf{Server} & \textbf{Scheduler} & \textbf{Sched. guarantee} &
+\textbf{Overload behavior} & \textbf{Budget rule} &
+\textbf{Main limitation} \\
+\hline
+Polling Server (PS) &
+RM (fixed) &
+Yes (same as periodic task) &
+Budget wasted if no job &
+Replenish at period start &
+Poor response time when job arrives just after replenishment \\
+\hline
+Deferrable Server (DS) &
+RM (fixed) &
+No (can violate RM bound) &
+Budget preserved; may overload &
+Replenish at period start; budget kept &
+Schedulability not provable with standard RM bound \\
+\hline
+Sporadic Server (SS) &
+RM (fixed) &
+Yes (behaves like periodic task) &
+Budget replenished after execution &
+Replenish after $T_s$ from first use &
+Complex replenishment tracking; fixed-priority only \\
+\hline
+Total Bandwidth Server (TBS) &
+EDF (dynamic) &
+Yes &
+Deadline postponed per job &
+No explicit budget; assigns deadline $d_k = \max(r_k, d_{k-1}) + C_k/U_s$ &
+No isolation: one large job can delay subsequent jobs within server \\
+\hline
+\textbf{CBS} &
+\textbf{EDF (dynamic)} &
+\textbf{Yes} &
+\textbf{Deadline postponed; budget recharged} &
+\textbf{Explicit budget $Q_s$; replenish on exhaustion or stale check} &
+\textbf{Requires EDF runtime; single-processor original formulation} \\
+\hline
+\end{tabular}
+\end{table*}
+
+% ============================================================
+\section{Detailed Comparison: CBS vs. Neighboring Approaches}
+% ============================================================
+
+\subsection{CBS vs. Polling Server}
+\begin{itemize}
+  \item PS operates under RM. It replenishes budget only at the start
+        of each server period. If no aperiodic job is waiting, the budget
+        is lost.
+  \item \textbf{Tradeoff:} PS has simple, predictable behavior and a
+        clean RM schedulability proof, but aperiodic response time can be
+        up to one full server period in the worst case.
+  \item CBS under EDF achieves much lower response time because the
+        server can use available slack immediately, not only at period
+        boundaries.
+  \item \textbf{Why PS is excluded from deep CBS analysis:} PS is a
+        fixed-priority server; the two live in different scheduling
+        frameworks. Comparing them requires choosing a common metric
+        (e.g., average aperiodic response time at equal utilization),
+        which is addressed in Buttazzo's simulation comparisons.
+\end{itemize}
+
+\subsection{CBS vs. Deferrable Server}
+\begin{itemize}
+  \item DS preserves unused budget across period boundaries, giving
+        better response time than PS. However, this means DS can
+        execute at the start of a new period with a full budget
+        \emph{and} has just replenished --- effectively doubling its
+        instantaneous demand, which violates the standard RM
+        utilization bound.
+  \item \textbf{Key tradeoff:} DS improves aperiodic response time
+        at the cost of formal schedulability. CBS (and SS) solve the
+        schedulability problem DS introduces.
+  \item CBS is in a different scheduler family (EDF), so direct
+        substitution is not always possible.
+\end{itemize}
+
+\subsection{CBS vs. Sporadic Server}
+\begin{itemize}
+  \item SS solves the same problem as CBS but for \emph{fixed-priority}
+        (RM) schedulers. SS replenishes budget $T_s$ time units after
+        the first execution unit is consumed, not at a fixed period
+        boundary. This gives it RM-compatible schedulability.
+  \item \textbf{Tradeoff:} SS requires tracking the replenishment time
+        for each budget chunk used, which is more complex to implement
+        than CBS. CBS has a simpler replenishment rule (refill to $Q_s$
+        on exhaustion or stale arrival) because EDF handles the priority
+        ordering automatically.
+  \item \textbf{Embedded systems consequence:} If the system already
+        uses RM (common in legacy RTOS), SS is the correct CBS analog.
+        CBS requires switching to EDF, which may not be feasible on
+        existing platforms.
+\end{itemize}
+
+\subsection{CBS vs. Total Bandwidth Server}
+\begin{itemize}
+  \item TBS is the direct EDF predecessor to CBS. TBS assigns each
+        arriving aperiodic job $k$ the deadline:
+        \begin{equation}
+          d_k = \max(r_k,\, d_{k-1}) + \frac{C_k}{U_s}
+          \label{eq:tbs}
+        \end{equation}
+        where $r_k$ is the arrival time and $C_k$ is the actual
+        execution time of job $k$.
+  \item TBS has no explicit budget variable. It is simpler to implement
+        than CBS.
+  \item \textbf{Key difference:} TBS uses the \emph{actual} execution
+        time $C_k$ of each job, which is only known at job completion.
+        This means TBS cannot provide temporal isolation against
+        overrunning tasks --- a job that runs longer than expected
+        pushes all subsequent deadlines further out. CBS uses an
+        \emph{explicit budget} $Q_s$: when the budget runs out, the
+        server recharged independently of what the job actually consumed,
+        bounding the damage of a single overrunning job.
+  \item \textbf{Tradeoff summary:} TBS is simpler and slightly more
+        responsive under normal load; CBS provides stronger isolation
+        and is safer under overload or in mixed-criticality contexts.
+\end{itemize}
+
+% ============================================================
+\section{Scientific and Engineering Tradeoffs}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Precision vs. simplicity:} CBS adds an arrival-time
+        check ($c_s \geq (d_s - t) \cdot U_s$) absent in TBS. This
+        makes CBS more complex but prevents stale-budget overload. For
+        simple systems with well-behaved aperiodic tasks, TBS may
+        suffice.
+  \item \textbf{Formal guarantee vs. practical deployability:} CBS
+        requires EDF. Many industrial RTOS (VxWorks, FreeRTOS, classic
+        AUTOSAR) use RM/fixed-priority by default. Deploying CBS
+        requires either an EDF-capable OS or a custom implementation.
+  \item \textbf{Isolation strength vs. utilization efficiency:} CBS's
+        budget cap means a short aperiodic burst that fits within $Q_s$
+        may still trigger a full $T_s$ wait before a new budget is
+        available. TBS in the same scenario would immediately assign a
+        tighter deadline. CBS trades some efficiency for stronger
+        isolation.
+  \item \textbf{Single-core vs. multi-core:} CBS is defined for a
+        single processor. Multi-core extension requires partitioning or
+        global EDF, both of which introduce new complexity (migration
+        overhead, cache effects, scheduling anomalies).
+  \item \textbf{Offline vs. online parameter selection:} $Q_s$ and
+        $T_s$ must be chosen offline. If aperiodic load is highly
+        variable, a fixed $(Q_s, T_s)$ pair may be too conservative
+        (wastes bandwidth) or too aggressive (poor isolation). Adaptive
+        CBS variants exist but are outside the basic formulation.
+\end{itemize}
+
+% ============================================================
+\section{Embedded Systems Consequences}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Timing determinism:} CBS provides a formal bound on
+        the CPU share consumed by aperiodic tasks. This is essential in
+        safety-critical embedded systems (automotive, avionics) where
+        interference between task classes must be bounded.
+  \item \textbf{Memory:} CBS server state is $O(1)$ per instance.
+        Suitable for microcontrollers with limited RAM.
+  \item \textbf{Energy:} EDF is work-conserving, which helps with
+        dynamic voltage/frequency scaling (DVFS). CBS preserves this
+        property since aperiodic tasks run whenever the server has
+        budget and processor is free.
+  \item \textbf{OS support requirement:} CBS needs an EDF-capable
+        scheduler with per-task deadline tracking and a budget timer.
+        Standard bare-metal RTOS with only fixed-priority support cannot
+        run CBS without modification. POSIX SCHED\_DEADLINE in Linux
+        implements a CBS-like mechanism.
+  \item \textbf{Deployment example (suitable):} A robotic controller
+        with periodic sensor fusion tasks (hard RT) plus event-driven
+        network message handlers (soft RT). CBS isolates the network
+        handler budget from the control loop.
+  \item \textbf{Deployment example (unsuitable):} A legacy automotive
+        ECU running AUTOSAR OS with fixed-priority scheduling. CBS
+        cannot be applied without replacing the scheduler; SS would be
+        the appropriate analog.
+\end{itemize}
+
+% ============================================================
+\section{Why Some Related Work Is Excluded}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Mixed-criticality scheduling:} Relevant to CBS
+        conceptually (task isolation, overload) but addresses a
+        different problem (varying assurance levels, WCET uncertainty).
+        Not included as related work for CBS specifically.
+  \item \textbf{Hierarchical/compositional scheduling:} CBS can be
+        used as a component in hierarchical scheduling (each subsystem
+        gets a CBS), but the hierarchical framework itself (e.g.,
+        Lipari-Bini) is a separate problem class. Relevant to mention
+        as an extension, not as direct related work.
+  \item \textbf{Non-preemptive scheduling:} CBS assumes full
+        preemption. Non-preemptive variants exist but are a different
+        design point.
+  \item \textbf{Multiprocessor global scheduling papers:} Out of scope
+        for the single-processor CBS formulation; relevant only if
+        multi-core CBS extension is addressed.
+\end{itemize}
+
+%%=============================================================
+%% REFERENCES
+%%=============================================================
+
+\section*{References}
+
+\begin{thebibliography}{9}
+
+\bibitem{buttazzo}
+G.~C.~Buttazzo,
+\textit{Hard Real-Time Computing Systems: Predictable Scheduling Algorithms
+and Applications}, 4th~ed.
+Springer, 2024.
+[Primary reference for CBS formal definition, budget and deadline
+rules, and schedulability analysis under EDF.]
+
+\bibitem{abeni1998}
+L.~Abeni and G.~Buttazzo,
+``Integrating Multimedia Applications in Hard Real-Time Systems,''
+in \textit{Proc. 19th IEEE Real-Time Systems Symposium
+(Cat. No. 98CB36279)}, IEEE, 1998, pp.~4--13.
+[Original CBS paper. Introduces the formal definition, budget/deadline
+rules, and schedulability proof.]
+
+\bibitem{abeni2004}
+L.~Abeni and G.~Buttazzo,
+``Resource Reservation in Dynamic Real-Time Systems,''
+\textit{Real-Time Systems}, vol.~27, no.~2, pp.~123--167, 2004.
+[Extended analysis of CBS including response time results and
+comparison with TBS.]
+
+\bibitem{ai_usage_m1}
+S.~Ferdous,
+\textit{AI Usage Protocol, Milestone 1: Constant Bandwidth Server},
+HSHL, 2026.
+[Protocol version 0.2; tool: ChatGPT GPT-5.5; 6 entries; JSON and
+.bib submitted with milestone.]
+
+\bibitem{ai_usage_m2}
+S.~Ferdous,
+\textit{AI Usage Protocol, Milestone 2: Constant Bandwidth Server},
+HSHL, 2026.
+[Protocol version 0.2; tool: Claude claude-sonnet-4-6; 3 entries; JSON and
+.bib submitted with milestone.]
+
+\end{thebibliography}
+
+\end{document}
