@@ -1,0 +1,106 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "1232368",
+  "course": "Special Emphasis-Real_Time_Systems",
+  "milestone": "Milestone-2",
+  "topic": "Constant Bandwidth Server",
+  "entries": [
+    {
+      "id": "e-939a1ed6",
+      "timestamp": "2026-05-31T20:06:36+00:00",
+      "parent_id": null,
+      "objective": "To compare CBS with related aperiodic server approaches (PS, DS, SS, TBS) and identify the key differences in scheduling base, formal guarantees, and overload behavior.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Compare Constant Bandwidth Server with Polling Server, Deferrable Server, Sporadic Server, and Total Bandwidth Server. Analyze differences in scheduler base, schedulability guarantee, overload behavior, and budget rules.",
+      "ai_output_summary": "Claude produced a structured comparison table and detailed analysis of CBS vs PS, DS, SS, and TBS covering scheduling framework, formal schedulability guarantees, overload handling, and budget replenishment rules.",
+      "verification": {
+        "actions": [
+          "Compared Claude output against Abeni 1998 (RTSS proceedings pp. 4-13) and Abeni 2004 (Real-Time Systems vol. 27 no. 2 pp. 123-167). Cross-checked TBS deadline assignment formula. Verified DS schedulability violation claim against Buttazzo primary reference."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Formal details verified against Abeni 1998 and Abeni 2004 papers. TBS deadline assignment formula cross-checked."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 9 - Comparison of Aperiodic Server Approaches",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction helped structure the comparison between CBS and neighboring servers. The output was partially accepted - the table structure was used but all technical claims were verified against primary sources before inclusion."
+    },
+    {
+      "id": "e-b3c7159c",
+      "timestamp": "2026-05-31T20:06:36+00:00",
+      "parent_id": null,
+      "objective": "To identify and analyze engineering tradeoffs between CBS and related approaches including precision vs simplicity, isolation vs efficiency, and single-core vs multi-core constraints.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Analyze the engineering tradeoffs of Constant Bandwidth Server compared to TBS, DS, and SS. Cover precision vs simplicity, formal guarantee vs deployability, isolation strength vs utilization efficiency, and single-core vs multi-core limitations.",
+      "ai_output_summary": "Claude produced a structured tradeoff analysis covering five dimensions: precision vs simplicity, formal guarantee vs practical deployability, isolation strength vs utilization efficiency, single-core vs multi-core, and offline vs online parameter selection.",
+      "verification": {
+        "actions": [
+          "Tradeoff claims cross-checked against Abeni 2004 and Buttazzo primary reference. EDF deployability constraint verified against known RTOS literature. Multi-core limitation confirmed as out of scope in original CBS formulation."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Multi-core discussion was generalized. Adaptive CBS variants mentioned but not deeply analyzed as they are outside basic CBS scope."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 11 - Scientific and Engineering Tradeoffs",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction helped identify the key tradeoffs of CBS in embedded systems contexts. Output was partially accepted - structure was used but claims were verified and rewritten in my own words."
+    },
+    {
+      "id": "e-43374b3a",
+      "timestamp": "2026-05-31T20:06:36+00:00",
+      "parent_id": null,
+      "objective": "To identify concrete embedded systems deployment scenarios where CBS is suitable and unsuitable, and analyze the OS support requirements for CBS implementation.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Identify practical embedded systems scenarios where Constant Bandwidth Server is suitable and unsuitable. Include OS support requirements, memory and energy considerations, and concrete deployment examples.",
+      "ai_output_summary": "Claude identified suitable deployment example (robotic controller with periodic sensor fusion plus event-driven network handlers) and unsuitable example (legacy automotive ECU with AUTOSAR fixed-priority OS). Also covered POSIX SCHED_DEADLINE as a CBS-like Linux implementation, memory overhead, and energy considerations under DVFS.",
+      "verification": {
+        "actions": [
+          "POSIX SCHED_DEADLINE reference verified as a known CBS-based implementation in Linux kernel. AUTOSAR fixed-priority constraint verified against known embedded OS literature. Memory and energy claims checked for plausibility against CBS formal definition."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "POSIX SCHED_DEADLINE details were not deeply analyzed. Energy analysis under DVFS was generalized and not formally proven."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 12 - Embedded Systems Consequences",
+        "usage_type": "idea-generation",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction helped identify concrete deployment contexts for CBS. The suitable and unsuitable examples were useful starting points but were rewritten and verified before inclusion in the milestone document."
+    }
+  ],
+  "exported_at": "2026-05-31T20:06:36+00:00"
+}
