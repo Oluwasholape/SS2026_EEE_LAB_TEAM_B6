@@ -1,0 +1,231 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "1232368",
+  "course": "Special Emphasis-Real_Time_Systems",
+  "milestone": "Milestone-1",
+  "topic": "Constant Bandwith Server",
+  "entries": [
+    {
+      "id": "e-62b80079",
+      "timestamp": "2026-05-25T14:17:58+00:00",
+      "parent_id": null,
+      "objective": "To understand the concept of a Constant Bandwidth Server (CBS) in real-time systems and analyze how it manages CPU bandwidth allocation for tasks while ensuring scheduling fairness and temporal isolation.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5"
+      },
+      "prompt": "Explain the concept of a Constant Bandwidth Server (CBS) in operating systems / real-time scheduling. Include its working principle, advantages, disadvantages, scheduling algorithm, practical applications, and examples.",
+      "ai_output_summary": "The AI explained that a Constant Bandwidth Server (CBS) is a scheduling mechanism used in real-time operating systems to guarantee a fixed share of CPU bandwidth for tasks. It described CBS parameters such as budget (Q) and period (T), explained how CBS works with Earliest Deadline First (EDF) scheduling, and highlighted features like temporal isolation, overload protection, and efficient resource sharing. It also included practical use cases such as multimedia systems, embedded systems, and cloud resource management.",
+      "verification": {
+        "actions": [
+          "I compared the AI explanation with:",
+          "Real-time systems textbooks (e.g., Real-Time Systems by Jane W. S. Liu)",
+          "Research papers on CBS and EDF scheduling",
+          "Operating systems course notes and academic articles",
+          "I checked:",
+          "Definition of CBS",
+          "Relationship between CBS and EDF scheduling",
+          "Parameters (budget and period)",
+          "Advantages and limitations",
+          "Real-world applications"
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The explanation was simplified and did not include mathematical proofs.",
+          "Some implementation details for Linux kernel scheduling were not discussed.",
+          "Real-world performance trade-offs under heavy overload conditions needed deeper explanation."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3.2 – Real-Time Scheduling Techniques",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "I learned that a Constant Bandwidth Server provides a way to reserve CPU resources for tasks while preventing one task from consuming more than its assigned bandwidth. This improved my understanding of real-time scheduling and how temporal isolation is maintained in dynamic systems. The AI explanation helped as an introductory summary, but verification from academic sources was necessary for technical accuracy and deeper scientific understanding."
+    },
+    {
+      "id": "e-08c3934e",
+      "timestamp": "2026-05-25T14:17:58+00:00",
+      "parent_id": null,
+      "objective": "To investigate how a Constant Bandwidth Server (CBS) improves task scheduling in real-time systems by allocating fixed CPU bandwidth and maintaining predictable performance under dynamic workloads.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5"
+      },
+      "prompt": "Describe the Constant Bandwidth Server (CBS) in real-time scheduling. Explain its architecture, scheduling mechanism, parameters, advantages, limitations, and practical examples in modern computing systems.",
+      "ai_output_summary": "The AI described Constant Bandwidth Server (CBS) as a real-time scheduling algorithm that assigns tasks a reserved amount of CPU execution time within a specific period. It explained that CBS usually works with Earliest Deadline First (EDF) scheduling and uses two main parameters: budget and period. The AI also explained how CBS prevents overload by postponing deadlines when tasks exceed their assigned execution budget. It highlighted benefits such as temporal isolation, fairness, and efficient CPU sharing, while also mentioning drawbacks such as implementation complexity and overhead in highly dynamic systems.",
+      "verification": {
+        "actions": [
+          "I validated the AI-generated information by comparing it with multiple sources:",
+          "Academic books on real-time operating systems",
+          "Research papers discussing CBS and EDF scheduling",
+          "University lecture materials on scheduling algorithms",
+          "Technical documentation from operating system scheduling references",
+          "I checked the following:",
+          "CBS definition and purpose",
+          "Mathematical meaning of budget and period",
+          "Deadline postponement mechanism",
+          "Integration with EDF scheduling",
+          "Advantages and performance trade-offs",
+          "Examples of real-time applications using CBS"
+        ],
+        "level": "multi-source-validation"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "The explanation covered the basic concepts well but lacked mathematical formulas for bandwidth calculation.",
+          "Some implementation-specific details were generalized.",
+          "The discussion of CBS in multicore systems was missing.",
+          "Real-time scheduling edge cases under extreme overload were not deeply addressed."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 4.1 – CPU Resource Reservation in Real-Time Systems",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction improved my understanding of how Constant Bandwidth Server scheduling works in real-time systems by introducing the concept of CPU bandwidth reservation and deadline management. It helped clarify how CBS ensures predictable task execution and prevents resource monopolization. However, additional academic sources were necessary to understand formal scheduling theory and implementation details. The AI response served as a useful starting point for research and concept exploration."
+    },
+    {
+      "id": "e-1975ee7c",
+      "timestamp": "2026-05-25T14:17:58+00:00",
+      "parent_id": null,
+      "objective": "To identify and analyze the advantages of Constant Bandwidth Server (CBS) in real-time scheduling systems.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5"
+      },
+      "prompt": "What are the main advantages of Constant Bandwidth Server (CBS) in real-time systems? Explain how CBS improves scheduling efficiency, fairness, and resource isolation.",
+      "ai_output_summary": "The AI explained that CBS provides several advantages in real-time scheduling, including temporal isolation, prevention of CPU monopolization, improved fairness among tasks, overload protection, efficient use of processing resources, and better predictability for soft real-time applications.",
+      "verification": {
+        "actions": [
+          "I checked whether the listed advantages matched standard scheduling theory concepts from lecture notes and academic summaries of CBS."
+        ],
+        "level": "plausibility-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Some advantages were described in simplified terms.",
+          "No quantitative performance analysis was provided."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3.3 – Advantages of CBS",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction helped identify the key strengths of CBS, especially its role in ensuring fairness and protecting tasks from interference in overloaded systems."
+    },
+    {
+      "id": "e-cf1307dd",
+      "timestamp": "2026-05-25T14:17:58+00:00",
+      "parent_id": null,
+      "objective": "To examine the limitations and disadvantages of Constant Bandwidth Server (CBS) in real-time scheduling.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5"
+      },
+      "prompt": "What are the limitations or disadvantages of Constant Bandwidth Server (CBS)? Explain technical challenges and situations where CBS may perform poorly.",
+      "ai_output_summary": "The AI identified limitations such as implementation complexity, scheduling overhead, parameter tuning difficulties, reduced efficiency in multicore systems, and possible deadline misses if system assumptions are violated.",
+      "verification": {
+        "actions": [
+          "I compared the AI explanation with research articles and operating system scheduling references discussing CBS weaknesses and implementation issues."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Some limitations were generalized.",
+          "Lack of detailed multicore scheduling discussion."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3.4 – Limitations of CBS",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction clarified that CBS is effective but not universally optimal, especially when implementation complexity and tuning challenges are considered."
+    },
+    {
+      "id": "e-b0ddb1fd",
+      "timestamp": "2026-05-25T14:17:58+00:00",
+      "parent_id": null,
+      "objective": "To understand the working principle of Constant Bandwidth Server (CBS) and how it manages task execution.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5"
+      },
+      "prompt": "Explain the working principle of Constant Bandwidth Server (CBS) step by step. Include budget, period, deadline assignment, and overload handling.",
+      "ai_output_summary": "The AI described that CBS assigns tasks a budget (Q) and period (T), monitors budget consumption during execution, and postpones deadlines when a task exceeds its reserved execution time, usually under EDF scheduling.",
+      "verification": {
+        "actions": [
+          "I verified the scheduling logic against textbook explanations and CBS algorithm diagrams."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Mathematical equations were simplified.",
+          "Edge-case behavior was not fully discussed."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3.2 – CBS Working Mechanism",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction helped me understand how CBS controls CPU execution through budget and deadline management."
+    },
+    {
+      "id": "e-a3136d15",
+      "timestamp": "2026-05-25T14:17:58+00:00",
+      "parent_id": null,
+      "objective": "To identify practical applications of Constant Bandwidth Server (CBS) in computing systems.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5"
+      },
+      "prompt": "Where is Constant Bandwidth Server (CBS) used in real-world systems? Give examples of practical applications in computing and embedded systems.",
+      "ai_output_summary": "The AI explained that CBS is used in multimedia systems, embedded controllers, robotics, cloud resource management, and soft real-time applications where predictable CPU bandwidth allocation is required.",
+      "verification": {
+        "actions": [
+          "I compared application examples with real-time systems literature and scheduling case studies."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Application examples were broad.",
+          "Limited implementation-specific details."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "Section 4.0 – Applications of CBS"
+    }
+  ],
+  "exported_at": "2026-05-25T14:17:58+00:00"
+}
