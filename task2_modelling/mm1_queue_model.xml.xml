@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>
+// Global Declarations
+// Cross-Traffic Intersection Management System
+// M/M/1 Queue Model — Week 2 Lab Milestone
+// Team B6 
+
+const int QSIZE = 4;
+int[0,QSIZE] count = 0;
+
+urgent chan arrive;
+urgent chan grant;
+</declaration>
+	<template>
+		<name>Vehicle</name>
+		<declaration>clock x;</declaration>
+		<location id="id0" x="0" y="0">
+			<name x="-10" y="-34">Arriving</name>
+		</location>
+		<location id="id1" x="200" y="0">
+			<name x="190" y="-34">InQueue</name>
+		</location>
+		<location id="id2" x="400" y="0">
+			<name x="390" y="-34">Crossing</name>
+			<label kind="invariant" x="390" y="17">x &lt;= 5</label>
+		</location>
+		<init ref="id0"/>
+		<transition id="id3">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="70" y="-20">arrive!</label>
+		</transition>
+		<transition id="id4">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="270" y="-20">grant?</label>
+			<label kind="assignment" x="270" y="0">x = 0</label>
+		</transition>
+		<transition id="id5">
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="150" y="70">x &gt;= 1</label>
+			<nail x="400" y="100"/>
+			<nail x="0" y="100"/>
+		</transition>
+	</template>
+	<template>
+		<name>Controller</name>
+		<location id="id6" x="0" y="0">
+			<name x="-10" y="-34">Ready</name>
+		</location>
+		<init ref="id6"/>
+		<transition id="id7">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-100" y="-100">count &lt; QSIZE</label>
+			<label kind="synchronisation" x="-100" y="-80">arrive?</label>
+			<label kind="assignment" x="-100" y="-60">count++</label>
+			<nail x="-50" y="-40"/>
+			<nail x="50" y="-40"/>
+		</transition>
+		<transition id="id8">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-100" y="40">count &gt; 0</label>
+			<label kind="synchronisation" x="-100" y="60">grant!</label>
+			<label kind="assignment" x="-100" y="80">count--</label>
+			<nail x="-50" y="40"/>
+			<nail x="50" y="40"/>
+		</transition>
+	</template>
+	<system>
+Vehicle0 = Vehicle();
+Ctrl = Controller();
+
+system Vehicle0, Ctrl;
+</system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment>Deadlock freedom — system never gets stuck</comment>
+			<result outcome="success" type="quality" timestamp="2026-05-31 23:33:55 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] count &lt;= QSIZE</formula>
+			<comment>Safety — queue never exceeds capacity</comment>
+			<result outcome="success" type="quality" timestamp="2026-05-31 23:33:57 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] count &gt;= 0</formula>
+			<comment>Safety — queue count never negative</comment>
+			<result outcome="success" type="quality" timestamp="2026-05-31 23:33:58 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Vehicle0.Crossing</formula>
+			<comment>Reachability — vehicle can reach Crossing</comment>
+			<result outcome="success" type="quality" timestamp="2026-05-31 23:34:00 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>Vehicle0.InQueue --&gt; Vehicle0.Crossing</formula>
+			<comment>Liveness — queued vehicle eventually crosses</comment>
+			<result outcome="success" type="quality" timestamp="2026-05-31 23:34:01 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>
