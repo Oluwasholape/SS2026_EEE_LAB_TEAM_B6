@@ -1,0 +1,106 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "1232368",
+  "course": "Special Emphasis_Real_Time_Systems",
+  "milestone": "Milestone-3",
+  "topic": "Constant Bandwith Server",
+  "entries": [
+    {
+      "id": "e-e28c21cc",
+      "timestamp": "2026-06-07T21:40:38+00:00",
+      "parent_id": null,
+      "objective": "To critically evaluate the strengths of CBS as a scheduling mechanism, identifying concrete technical advantages beyond generic claims.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Identify concrete strengths of the Constant Bandwidth Server in real-time scheduling. Focus on specific technical properties such as schedulability guarantee, temporal isolation, work-conserving behavior, and runtime overhead.",
+      "ai_output_summary": "Claude identified six concrete strengths: formal schedulability guarantee via EDF utilization bound, temporal isolation preventing overrunning tasks from affecting periodic tasks, work-conserving behavior improving aperiodic response time, simple schedulability test identical to periodic task analysis, O(1) runtime overhead, and graceful overload handling through deadline postponement.",
+      "verification": {
+        "actions": [
+          "Strengths verified against Abeni 1998 (pp. 4-13) and Abeni 2004 (vol. 27, pp. 123-167). Schedulability bound cross-checked against EDF utilization condition. Temporal isolation property verified against CBS formal definition."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Generic overhead claims verified. Hard CBS variant strengths not analyzed as outside basic formulation scope."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 1 - Concrete Strengths",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "Helped identify concrete rather than generic strengths. Output partially accepted - all claims verified against primary sources before inclusion."
+    },
+    {
+      "id": "e-2e09f3a4",
+      "timestamp": "2026-06-07T21:40:38+00:00",
+      "parent_id": null,
+      "objective": "To identify concrete limitations, hidden assumptions, and risks of CBS that may affect its applicability in realistic embedded systems.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4.6"
+      },
+      "prompt": "What are the concrete limitations, hidden assumptions, and risks of the Constant Bandwidth Server? Include EDF dependency, parameter selection, single-core assumption, resource sharing, and scalability issues.",
+      "ai_output_summary": "Claude identified six limitations: EDF dependency blocking deployment on fixed-priority RTOS, no per-job hard deadline guarantee, static offline parameter selection risk, single-processor formulation with no multi-core extension, no resource sharing support, and budget timer overhead. Hidden assumptions identified: implicit deadlines, full preemption, reliable WCET estimation, and ideal EDF runtime.",
+      "verification": {
+        "actions": [
+          "EDF dependency and single-core limitation confirmed against Buttazzo 4th ed. and Abeni 1998. AUTOSAR fixed-priority constraint verified against known embedded OS literature. Parameter selection risk verified against Abeni 2004 discussion of CBS bandwidth allocation."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Multi-core CBS extensions exist in recent literature but were not analyzed as they are outside the basic CBS formulation scope."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 - Concrete Limitations and Risks",
+        "usage_type": "idea-generation",
+        "direct_text_reused": false
+      },
+      "reflection": "Helped structure the limitations analysis systematically. Output partially accepted - claims rewritten in my own words and verified against primary sources before inclusion."
+    },
+    {
+      "id": "e-d80b8497",
+      "timestamp": "2026-06-07T21:40:38+00:00",
+      "parent_id": null,
+      "objective": "To identify suitable and unsuitable embedded systems deployment scenarios for CBS and propose meaningful extensions and open research questions.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4.6"
+      },
+      "prompt": "Claude identified two suitable scenarios: robotic arm controller with periodic control and soft aperiodic commands, and multimedia streaming on embedded Linux using SCHED_DEADLINE. Three unsuitable scenarios identified: AUTOSAR ECU with fixed-priority only, hard real-time aperiodic tasks requiring per-job deadline guarantee, and multi-core SoC with shared cache. Four extensions proposed: adaptive CBS, multi-core CBS, CBS combined with SRP/PCP, and hard CBS variant analysis. Open question: closed-form worst-case response time bound for aperiodic jobs under CBS.",
+      "ai_output_summary": "Claude identified two suitable scenarios: robotic arm controller with periodic control and soft aperiodic commands, and multimedia streaming on embedded Linux using SCHED_DEADLINE. Three unsuitable scenarios identified: AUTOSAR ECU with fixed-priority only, hard real-time aperiodic tasks requiring per-job deadline guarantee, and multi-core SoC with shared cache. Four extensions proposed: adaptive CBS, multi-core CBS, CBS combined with SRP/PCP, and hard CBS variant analysis. Open question: closed-form worst-case response time bound for aperiodic jobs under CBS.",
+      "verification": {
+        "actions": [
+          "SCHED_DEADLINE as CBS-like mechanism verified as known Linux kernel feature. AUTOSAR fixed-priority constraint verified against known embedded OS literature. SRP and PCP resource sharing protocols verified as standard real-time scheduling extensions. Adaptive CBS mentioned in Abeni 2004."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Adaptive CBS details not deeply analyzed. Multi-core CBS extensions exist in recent literature but full analysis outside scope of basic CBS milestone."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 5, 6, 7 - Scenarios and Extensions",
+        "usage_type": "other",
+        "direct_text_reused": false
+      },
+      "reflection": "Helped identify concrete deployment contexts and meaningful extensions. All scenarios and extensions rewritten and verified before inclusion. Open research question on response time bound is genuine and not resolved in basic CBS literature."
+    }
+  ],
+  "exported_at": "2026-06-07T21:40:38+00:00"
+}

@@ -1,0 +1,287 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+\begin{document}
+
+\title{Constant Bandwidth Server: Critical Evaluation and Transfer\\
+{\footnotesize Milestone 3 --- Real-Time Systems Seminar, HSHL}}
+
+\author{\IEEEauthorblockN{Soaib Ferdous}
+\IEEEauthorblockA{\textit{BEng in Electronic Engineering} \\
+\textit{Hochschule Hamm-Lippstadt}\\
+Student ID: 1232368 \\
+Group B, Team 6}}
+
+\maketitle
+
+% ============================================================
+\section{Concrete Strengths}
+% ============================================================
+
+% Annotation: not generic advantages — specific to CBS design choices
+
+\begin{itemize}
+  \item \textbf{Formal schedulability guarantee:}
+        CBS integrates into EDF analysis as a virtual periodic task with
+        $U_s = Q_s/T_s$ $\Rightarrow$ schedulability test is exact,
+        not heuristic
+  \item \textbf{Temporal isolation:}
+        overrunning aperiodic task cannot affect periodic tasks beyond
+        $U_s$ bandwidth $\Rightarrow$ stronger than DS, TBS
+  \item \textbf{Work-conserving:}
+        server uses available slack immediately when job arrives and
+        budget is fresh $\Rightarrow$ better aperiodic response time
+        than PS
+  \item \textbf{Simple schedulability test:}
+        same EDF condition as periodic tasks --- no separate analysis
+        needed for the server
+        \begin{equation}
+          U_s + \sum_{i=1}^{n} \frac{C_i}{T_i} \leq 1
+        \end{equation}
+  \item \textbf{Low runtime overhead:}
+        $O(1)$ server state update per event --- feasible on
+        resource-constrained embedded hardware
+  \item \textbf{Graceful overload handling:}
+        overrunning task continues execution at lower EDF priority
+        (deadline postponed) $\Rightarrow$ no job is killed or dropped
+\end{itemize}
+
+% ============================================================
+\section{Concrete Limitations and Risks}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{EDF dependency:}
+        CBS cannot run on fixed-priority schedulers (RM, DM, AUTOSAR)
+        without replacing the scheduler $\Rightarrow$ major deployment
+        barrier in industry
+  \item \textbf{No hard per-job response time guarantee:}
+        CBS guarantees bandwidth, not individual aperiodic job deadlines
+        $\Rightarrow$ unsuitable for hard real-time aperiodic tasks
+  \item \textbf{Parameter selection is offline and static:}
+        $Q_s$ and $T_s$ must be set before runtime. Under highly
+        variable aperiodic load, a fixed $(Q_s, T_s)$ pair may be:
+        \begin{itemize}
+          \item too conservative $\Rightarrow$ wasted bandwidth
+          \item too aggressive $\Rightarrow$ insufficient isolation
+        \end{itemize}
+  \item \textbf{Single-processor formulation:}
+        original CBS has no multi-core extension $\Rightarrow$
+        multi-core requires global EDF or partitioning, both introducing
+        new complexity (migration, cache effects, scheduling anomalies)
+  \item \textbf{No resource sharing support:}
+        basic CBS does not handle shared resources or priority inversion
+        $\Rightarrow$ must be extended (e.g., combined with SRP or PCP)
+  \item \textbf{Budget timer overhead:}
+        requires one hardware timer interrupt per active server period
+        $\Rightarrow$ problematic on systems with limited timer hardware
+\end{itemize}
+
+% ============================================================
+\section{Hidden or Unrealistic Assumptions}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Assumption: implicit deadlines ($D_i = T_i$):}
+        CBS schedulability proof assumes periodic tasks have implicit
+        deadlines. Constrained deadlines ($D_i < T_i$) require
+        additional analysis.
+  \item \textbf{Assumption: fully preemptive system:}
+        non-preemptive or limited-preemption RTOS violates CBS
+        correctness $\Rightarrow$ blocking time must be accounted for
+  \item \textbf{Assumption: reliable WCET estimation:}
+        $Q_s$ is a design parameter, not a measured WCET. If aperiodic
+        tasks consistently exceed $Q_s$, temporal isolation holds but
+        response time degrades significantly
+  \item \textbf{Assumption: single aperiodic server:}
+        multiple CBS servers on one processor are possible but require
+        careful bandwidth allocation to avoid over-commitment:
+        $\sum U_{s,k} + \sum U_i \leq 1$
+  \item \textbf{Assumption: ideal EDF runtime:}
+        EDF requires $O(\log n)$ priority queue management at each
+        scheduling event $\Rightarrow$ overhead non-trivial on very
+        small MCUs with limited clock speed
+\end{itemize}
+
+% ============================================================
+\section{Scalability Analysis}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Runtime scalability:}
+        server state update $O(1)$ per event $\Rightarrow$ scales well
+        with number of aperiodic jobs
+  \item \textbf{System size scalability:}
+        each additional CBS server adds $U_{s,k}$ to EDF utilization
+        $\Rightarrow$ total bandwidth still bounded by Eq.~(1);
+        multiple servers are feasible if total $U \leq 1$
+  \item \textbf{Memory scalability:}
+        constant per server ($Q_s$, $T_s$, $c_s$, $d_s$, queue pointer)
+        $\Rightarrow$ scales to many servers on embedded hardware
+  \item \textbf{Multi-core scalability:}
+        \textbf{does not scale} without major extensions. Global EDF
+        with CBS on $m$ cores has open research problems (migration
+        overhead, processor affinity, cache pollution)
+  \item \textbf{Overload scalability:}
+        under sustained overload (aperiodic demand $> U_s$), jobs queue
+        and response time grows unboundedly $\Rightarrow$ CBS provides
+        isolation but not bounded response under permanent overload
+\end{itemize}
+
+% ============================================================
+\section{Suitable Application Scenarios}
+% ============================================================
+
+\textbf{Scenario 1: Robotic arm controller}
+\begin{itemize}
+  \item Periodic: joint control loop at 1~kHz (hard RT)
+  \item Aperiodic: operator commands, sensor fault events (soft RT)
+  \item CBS assigns $U_s$ to command handler; control loop unaffected
+        under any aperiodic load
+  \item Why suitable: single-core EDF system, soft aperiodic deadlines,
+        need for formal bandwidth separation
+\end{itemize}
+
+\textbf{Scenario 2: Multimedia streaming on embedded Linux}
+\begin{itemize}
+  \item Periodic: audio/video decode tasks (hard RT)
+  \item Aperiodic: network packet handler (soft RT)
+  \item Linux \texttt{SCHED\_DEADLINE} implements CBS-like mechanism
+  \item Why suitable: EDF available, temporal isolation needed,
+        network bursts must not affect decode quality
+\end{itemize}
+
+% ============================================================
+\section{Unsuitable Application Scenarios}
+% ============================================================
+
+\textbf{Scenario 1: AUTOSAR automotive ECU}
+\begin{itemize}
+  \item AUTOSAR OS uses fixed-priority scheduling (OSEK standard)
+  \item CBS cannot be applied without replacing the scheduler
+  \item Why unsuitable: fixed-priority only; use Sporadic Server instead
+\end{itemize}
+
+\textbf{Scenario 2: Hard real-time aperiodic tasks}
+\begin{itemize}
+  \item Example: safety-critical interrupt handler with hard deadline
+  \item CBS provides bandwidth guarantee, NOT per-job deadline guarantee
+  \item If aperiodic job must meet a hard deadline, CBS cannot certify it
+  \item Why unsuitable: no formal per-job response time bound in basic CBS
+\end{itemize}
+
+\textbf{Scenario 3: Multi-core SoC with shared cache}
+\begin{itemize}
+  \item CBS defined for single processor
+  \item Multi-core introduces cache contention and migration overhead
+        not modeled in CBS
+  \item Why unsuitable: formal guarantees break under multi-core
+        without specialized extensions
+\end{itemize}
+
+% ============================================================
+\section{Proposed Extensions and Open Questions}
+% ============================================================
+
+\begin{itemize}
+  \item \textbf{Extension 1 — Adaptive CBS:}
+        dynamically adjust $(Q_s, T_s)$ based on observed aperiodic
+        load $\Rightarrow$ better bandwidth efficiency under variable load.
+        Open question: how to guarantee stability during parameter transitions?
+
+  \item \textbf{Extension 2 — Multi-core CBS:}
+        extend budget/deadline rules to global EDF on $m$ processors.
+        Open question: how to handle task migration without violating
+        temporal isolation?
+
+  \item \textbf{Extension 3 — CBS with resource sharing:}
+        combine CBS with Stack Resource Policy (SRP) or Priority Ceiling
+        Protocol (PCP) to handle shared resources.
+        Open question: does the schedulability bound change when
+        blocking time is added?
+
+  \item \textbf{Extension 4 — Hard CBS variant:}
+        Buttazzo describes a stricter replenishment rule (``hard CBS'').
+        Open question: does hard CBS improve isolation at the cost of
+        response time, and under what workload does it outperform
+        standard CBS?
+
+  \item \textbf{Open research question:}
+        Is there a closed-form worst-case response time bound for
+        aperiodic jobs under CBS (analogous to the DS response time
+        analysis under RM)?
+\end{itemize}
+
+% ============================================================
+\section{Milestone 3 Checklist Mapping}
+% ============================================================
+
+\begin{table}[h]
+\centering
+\caption{M3 Checklist Mapping}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|p{5.5cm}|p{2.0cm}|}
+\hline
+\textbf{M3 Requirement} & \textbf{Section} \\
+\hline
+Concrete strengths of CBS & Section 1 \\
+\hline
+Concrete limitations and risks of CBS & Section 2 \\
+\hline
+Hidden or unrealistic assumptions in CBS & Section 3 \\
+\hline
+Runtime, memory, scalability implications & Section 4 \\
+\hline
+Suitable application example for CBS & Section 5 \\
+\hline
+Unsuitable application example for CBS & Section 6 \\
+\hline
+Proposed extensions and open questions & Section 7 \\
+\hline
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section*{References}
+% ============================================================
+
+\begin{thebibliography}{9}
+
+\bibitem{buttazzo}
+G.~C.~Buttazzo,
+\textit{Hard Real-Time Computing Systems: Predictable Scheduling
+Algorithms and Applications}, 4th~ed.
+Springer, 2024.
+[Primary reference. CBS in chapter on aperiodic task servers.]
+
+\bibitem{abeni1998}
+L.~Abeni and G.~Buttazzo,
+``Integrating Multimedia Applications in Hard Real-Time Systems,''
+in \textit{Proc. 19th IEEE Real-Time Systems Symposium
+(Cat. No. 98CB36279)}, IEEE, 1998, pp.~4--13.
+[Original CBS paper: formal definition, budget/deadline rules,
+schedulability proof.]
+
+\bibitem{abeni2004}
+L.~Abeni and G.~Buttazzo,
+``Resource Reservation in Dynamic Real-Time Systems,''
+\textit{Real-Time Systems}, vol.~27, no.~2, pp.~123--167, 2004.
+[Extended CBS analysis: response time results, comparison with TBS.]
+
+\bibitem{ai_usage_m3}
+S.~Ferdous,
+\textit{AI Usage Protocol, Milestone 3: Constant Bandwidth Server},
+HSHL, 2026.
+[Protocol v0.2; tool: Claude claude-sonnet-4-6; JSON+bib submitted.]
+
+\end{thebibliography}
+
+\end{document}
