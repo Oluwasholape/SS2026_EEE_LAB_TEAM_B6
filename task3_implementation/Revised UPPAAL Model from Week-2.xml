@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>
+// =====================================================================
+// Cross-Traffic Intersection Management System
+// Conflict-aware M/M/c Queue Model  (set c = 1 for M/M/1, c = 2 for M/M/2)
+// Team B6
+//
+// IDEA:
+//   - N vehicles approach a 4-way intersection.
+//   - Each vehicle belongs to an AXIS:
+//        axis 0 = North-South (vertical path)
+//        axis 1 = East-West   (horizontal path)
+//   - Two cars on DIFFERENT axes have crossing paths =&gt; they CONFLICT.
+//   - Two cars on the SAME axis do NOT conflict (they pass each other).
+//   - The controller may allow up to c cars to cross at the same time,
+//     but ONLY if they are all on the same axis (no conflict).
+//
+// SAFETY (the heart of the project):
+//   Never have a North-South car and an East-West car crossing together.
+// =====================================================================
+
+const int N = 4;          // number of vehicles
+const int c = 2;          // servers: 1 = M/M/1, 2 = M/M/2  (FLIP THIS TO COMPARE)
+
+// How many cars are currently crossing on each axis.
+// Bounded integers keep the state space small (tutorial section 4).
+int[0,N] crossingNS = 0;  // cars crossing on North-South axis right now
+int[0,N] crossingEW = 0;  // cars crossing on East-West  axis right now
+
+// Synchronization channels (tutorial section 3).
+// Indexed by vehicle id so the controller talks to a specific car.
+chan request[N];   // vehicle -&gt; controller : "I want to cross"
+chan grant[N];     // controller -&gt; vehicle : "you may cross"
+chan done[N];      // vehicle -&gt; controller : "I have cleared the intersection"
+
+// Each vehicle's axis, known to the controller.
+// axisOf[id] = 0 (North-South) or 1 (East-West).
+// This MUST match the axis given to each Vehicle in the system section.
+// It lets the controller decrement the correct counter on 'done'
+// without guessing (which is what caused the out-of-range error).
+const int[0,1] axisOf[N] = {0, 0, 1, 1};
+
+// Total number of cars currently crossing (used for the capacity rule).
+int totalCrossing() {
+    return crossingNS + crossingEW;
+}
+
+// A car on the given axis may be granted access if:
+//   (1) capacity is not full:           totalCrossing() &lt; c
+//   (2) no conflicting axis is busy:     the OTHER axis has 0 cars crossing
+// This single function encodes BOTH the M/M/c capacity rule
+// AND the directional conflict rule (FR-02 and FR-06).
+bool canGrant(int axis) {
+    if (totalCrossing() &gt;= c) return false;
+    if (axis == 0) return crossingEW == 0;   // NS car needs EW empty
+    else           return crossingNS == 0;   // EW car needs NS empty
+}
+</declaration>
+	<template>
+		<name>Vehicle</name>
+		<parameter>const int[0,N-1] id, const int[0,1] axis</parameter>
+		<declaration>
+// Local clock measures how long this car spends crossing (tutorial section 1-2).
+clock x;
+</declaration>
+		<location id="id0" x="-200" y="0">
+			<name x="-210" y="-34">Idle</name>
+		</location>
+		<location id="id1" x="0" y="0">
+			<name x="-10" y="-34">Waiting</name>
+		</location>
+		<location id="id2" x="200" y="0">
+			<name x="190" y="-34">Crossing</name>
+			<label kind="invariant" x="190" y="17">x &lt;= 5</label>
+		</location>
+		<init ref="id0"/>
+		<transition id="id3">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-150" y="-20">request[id]!</label>
+		</transition>
+		<transition id="id4">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="50" y="-20">grant[id]?</label>
+			<label kind="assignment" x="50" y="0">x = 0</label>
+		</transition>
+		<transition id="id5">
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-30" y="80">x &gt;= 2</label>
+			<label kind="synchronisation" x="-30" y="100">done[id]!</label>
+			<nail x="200" y="140"/>
+			<nail x="-200" y="140"/>
+		</transition>
+	</template>
+	<template>
+		<name>Controller</name>
+		<declaration>
+// The controller chooses which waiting car to admit.
+// "select" lets UPPAAL try every vehicle id non-deterministically,
+// so the model explores all admission orders (tutorial section 4).
+</declaration>
+		<location id="id6" x="102" y="-102">
+			<name x="92" y="-136">Ready</name>
+		</location>
+		<init ref="id6"/>
+		<transition id="id7">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="select" x="-198" y="-222">i : int[0,N-1]</label>
+			<label kind="synchronisation" x="-198" y="-202">request[i]?</label>
+			<nail x="-58" y="-172"/>
+			<nail x="262" y="-172"/>
+		</transition>
+		<transition id="id8">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="select" x="-198" y="-42">i : int[0,N-1]</label>
+			<label kind="guard" x="-198" y="-22">canGrant(axisOf[i])</label>
+			<label kind="synchronisation" x="-198" y="-2">grant[i]!</label>
+			<label kind="assignment" x="-198" y="18">axisOf[i] == 0 ? crossingNS++ : crossingEW++</label>
+			<nail x="-58" y="-32"/>
+			<nail x="262" y="-32"/>
+		</transition>
+		<transition id="id9">
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="select" x="302" y="-132">i : int[0,N-1]</label>
+			<label kind="synchronisation" x="302" y="-112">done[i]?</label>
+			<label kind="assignment" x="302" y="-92">axisOf[i] == 0 ? crossingNS-- : crossingEW--</label>
+			<nail x="262" y="-102"/>
+			<nail x="362" y="-102"/>
+		</transition>
+	</template>
+	<system>
+// Assign each vehicle an id and an axis.
+// Vehicles 0,1 travel North-South (axis 0).
+// Vehicles 2,3 travel East-West  (axis 1).
+// This gives us guaranteed conflict pairs to test the safety property.
+Vehicle0 = Vehicle(0, 0);
+Vehicle1 = Vehicle(1, 0);
+Vehicle2 = Vehicle(2, 1);
+Vehicle3 = Vehicle(3, 1);
+Ctrl     = Controller();
+
+system Vehicle0, Vehicle1, Vehicle2, Vehicle3, Ctrl;
+</system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment>Deadlock freedom: the system never gets permanently stuck.</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:09 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] not (crossingNS &gt; 0 &amp;&amp; crossingEW &gt; 0)</formula>
+			<comment>SAFETY (core): never a North-South car and an East-West car crossing at the same time. This is the conflict-freedom property (FR-06).</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:11 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] (crossingNS + crossingEW) &lt;= c</formula>
+			<comment>SAFETY (capacity): never more than c cars crossing at once (the M/M/c rule, FR-02).</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:24 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] crossingNS &gt;= 0 &amp;&amp; crossingEW &gt;= 0</formula>
+			<comment>SAFETY: counters never go negative.</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:30 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Vehicle0.Crossing</formula>
+			<comment>Reachability: a North-South vehicle can actually cross.</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:32 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Vehicle2.Crossing</formula>
+			<comment>Reachability: an East-West vehicle can actually cross.</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:33 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>E&lt;&gt; (Vehicle0.Crossing &amp;&amp; Vehicle1.Crossing)</formula>
+			<comment>Reachability (M/M/2 benefit): two SAME-axis cars can cross together. With c=2 this should be SATISFIED; with c=1 it should NOT be satisfied. This single query demonstrates the M/M/1 vs M/M/2 difference.</comment>
+			<result outcome="failure" type="quality" timestamp="2026-06-07 19:28:02 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] not (Vehicle0.Crossing &amp;&amp; Vehicle2.Crossing)</formula>
+			<comment>SAFETY: two CONFLICTING cars (different axes) never cross together, regardless of c.</comment>
+			<result outcome="success" type="quality" timestamp="2026-06-07 19:28:05 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>Vehicle0.Waiting --&gt; Vehicle0.Crossing</formula>
+			<comment>Liveness/response: a waiting North-South vehicle eventually crosses.</comment>
+			<result outcome="failure" type="quality" timestamp="2026-06-07 19:28:35 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>Vehicle2.Waiting --&gt; Vehicle2.Crossing</formula>
+			<comment>Liveness/response: a waiting East-West vehicle eventually crosses.</comment>
+			<result outcome="failure" type="quality" timestamp="2026-06-07 19:28:37 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>
