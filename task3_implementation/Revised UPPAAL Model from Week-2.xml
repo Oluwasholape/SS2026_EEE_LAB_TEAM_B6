@@ -17,41 +17,33 @@
 //   - The controller may allow up to c cars to cross at the same time,
 //     but ONLY if they are all on the same axis (no conflict).
 //
-// SAFETY (the heart of the project):
+
 //   Never have a North-South car and an East-West car crossing together.
 // =====================================================================
 
 const int N = 4;          // number of vehicles
-const int c = 2;          // servers: 1 = M/M/1, 2 = M/M/2  (FLIP THIS TO COMPARE)
+const int c = 2;          // servers: 1 = M/M/1, 2 = M/M/2  
 
 // How many cars are currently crossing on each axis.
-// Bounded integers keep the state space small (tutorial section 4).
+
 int[0,N] crossingNS = 0;  // cars crossing on North-South axis right now
 int[0,N] crossingEW = 0;  // cars crossing on East-West  axis right now
 
-// Synchronization channels (tutorial section 3).
-// Indexed by vehicle id so the controller talks to a specific car.
+
+
 chan request[N];   // vehicle -&gt; controller : "I want to cross"
 chan grant[N];     // controller -&gt; vehicle : "you may cross"
 chan done[N];      // vehicle -&gt; controller : "I have cleared the intersection"
 
-// Each vehicle's axis, known to the controller.
-// axisOf[id] = 0 (North-South) or 1 (East-West).
-// This MUST match the axis given to each Vehicle in the system section.
-// It lets the controller decrement the correct counter on 'done'
-// without guessing (which is what caused the out-of-range error).
+
 const int[0,1] axisOf[N] = {0, 0, 1, 1};
 
-// Total number of cars currently crossing (used for the capacity rule).
+
 int totalCrossing() {
     return crossingNS + crossingEW;
 }
 
-// A car on the given axis may be granted access if:
-//   (1) capacity is not full:           totalCrossing() &lt; c
-//   (2) no conflicting axis is busy:     the OTHER axis has 0 cars crossing
-// This single function encodes BOTH the M/M/c capacity rule
-// AND the directional conflict rule (FR-02 and FR-06).
+
 bool canGrant(int axis) {
     if (totalCrossing() &gt;= c) return false;
     if (axis == 0) return crossingEW == 0;   // NS car needs EW empty
