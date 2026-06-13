@@ -125,7 +125,7 @@ Comparing M/M/1 against M/M/2 on waiting time, throughput, and queue length is t
 
 ## 10. Use-Case Overview
 
-The use-case diagram is delivered separately as `UseCaseDiagram_Week1.pdf`. This section states the same model in text so the two documents agree.
+The use-case diagram is delivered separately as `UseCaseDiagram.pdf`. This section states the same model in text so the two documents agree.
 
 **Actors:**
 
