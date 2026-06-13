@@ -4,8 +4,6 @@
 
 **Milestone:** Week 1, Requirements and Use-Cases
 
-**Repository:** https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/task1_requirements
-
 ---
 
 ## 1. Purpose and Scope
