@@ -4,3 +4,7 @@ This section contains the system requirements, both functional and non-functiona
 
 #### Done by:
 Oyemade, Oluwasholape Daniel
+
+#### Revised by:
+- Ferdous, Soaib
+- Nnachi-Egwu, Nnaemeka
