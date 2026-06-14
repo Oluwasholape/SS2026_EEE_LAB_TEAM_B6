@@ -1,0 +1,138 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "1232368",
+  "course": "HW/SW CoDesign",
+  "milestone": "Milestone-3",
+  "topic": "High-Level Synthesis with Tabu Search Scheduling",
+  "entries": [
+    {
+      "id": "e-f65ac24a",
+      "timestamp": "2026-06-14T14:40:45+00:00",
+      "parent_id": null,
+      "objective": "Identify the strengths of TS-PRED supported by experimental evidence from the paper.",
+      "ai_tool": {
+        "name": "claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "What are the main strengths of the TS-PRED Tabu Search algorithm for HLS scheduling based on Sevaux et al. (2011)? Support each strength with evidence from the paper's experimental results.",
+      "ai_output_summary": "AI listed six strengths: handles precedence constraints uniquely among heuristics; always finds a feasible solution including n=1000 cases; near-optimal on small instances with deviation under 1.24%; faster than ILP with growing speed advantage; effective on real-life electronic circuit instances; preprocessing reduces search space.",
+      "verification": {
+        "actions": [
+          "Verified deviation figures (1.24% at n=100) against Table 2 of Sevaux et al. (2011), p. 209. Verified real-life instance performance (27/27 optimal) against Table 4, p. 211. Confirmed that TS-PRED is described as the only heuristic for instances with precedence in Section 1, p. 202."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "None — all strengths were traceable to specific sections and tables of the paper."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 1 (Strengths)",
+        "usage_type": "summarization",
+        "direct_text_reused": false
+      },
+      "reflection": "Grounding each strength in a specific table or section of the paper made this section much more credible than a general list of claimed advantages. This approach should be applied to all evaluation sections."
+    },
+    {
+      "id": "e-c39492fc",
+      "timestamp": "2026-06-14T14:40:45+00:00",
+      "parent_id": null,
+      "objective": "Identify limitations, weaknesses and hidden assumptions of the TS-PRED model.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "What are the limitations and hidden assumptions of TS-PRED for HLS scheduling? Consider the problem model, algorithm design, and experimental evaluation separately.",
+      "ai_output_summary": "AI identified: no optimality guarantee; empirically tuned parameters with no theoretical justification; identical processor assumption excluding heterogeneous FUs; integer time model; single objective only; no sensitivity analysis reported. For hidden assumptions: DAG precedence structure, non-preemptive jobs, fixed release and due dates.",
+      "verification": {
+        "actions": [
+          "Verified the identical processor assumption against Section 1 of the paper. Confirmed the empirical parameter tuning statement from Section 3, p. 208. Checked that no sensitivity analysis is reported — confirmed by absence in the paper. Verified the DAG assumption from Section 2.1 where acyclicity is implied by the topological ordering scheme."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI suggested a limitation about memory usage but this is not discussed in the paper at all — removed as unverifiable. AI did not identify the non-preemptive assumption explicitly — added manually since this is implicit in the model where each job runs continuously from start to completion."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Sections 2 and 3 (Limitations and Hidden Assumptions)",
+        "usage_type": "argument-critique",
+        "direct_text_reused": false
+      },
+      "reflection": "AI correctly identified most structural limitations but missed implicit assumptions embedded in the mathematical model. Reading the ILP formulation carefully revealed the non-preemptive and DAG assumptions that the paper does not state explicitly."
+    },
+    {
+      "id": "e-29dc4b10",
+      "timestamp": "2026-06-14T14:40:45+00:00",
+      "parent_id": null,
+      "objective": "Analyse scalability behaviour of TS-PRED across instance types and sizes from Tables 2, 3 and 4.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Analyse the scalability of TS-PRED based on the experimental results in Tables 2, 3 and 4 of Sevaux et al. (2011). What patterns emerge as n increases and how do instance types affect performance?",
+      "ai_output_summary": "AI noted that without precedence, deviation grows slowly from 0% at n=20 to 1.24% at n=100. With precedence, performance degrades at n=250 and beyond, especially for Type 2. Type 4 performs better due to larger processing time leeway. For n=1000 ILP is unusable while TS-PRED still finds feasible solutions for all instances.",
+      "verification": {
+        "actions": [
+          "Verified all figures against Tables 2, 3 and 4 of Sevaux et al. (2011), pp. 209-211. Confirmed Type 4 advantage explanation from the authors' own discussion on p. 210. Checked n=1000 ILP failure from Table 3 where #Feas=0 for Types 1 and 3."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI stated that TS-PRED always finds the optimal solution for n=1000 Type 4 — this is incorrect. Table 3 shows #Opt=0 for n=1000 Type 4 because ILP also finds 0 optimal solutions, making comparison unavailable. Corrected manually after checking the table."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": false,
+        "section": "Section 4 (Scalability Analysis)",
+        "usage_type": "argument-critique",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction produced a factual error that required careful table reading to catch. AI confused feasible solutions with optimal solutions for the n=1000 Type 4 case. Always verify numerical claims against the actual tables."
+    },
+    {
+      "id": "e-9870d641",
+      "timestamp": "2026-06-14T14:40:45+00:00",
+      "parent_id": null,
+      "objective": "Identify proposed extensions and open research questions beyond the scope of the paper.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "What extensions to TS-PRED do the authors propose in Sevaux et al. (2011)? What additional research directions would be natural given the limitations of the current approach?",
+      "ai_output_summary": "AI identified three author-proposed extensions: memetic algorithm with population management (MA|PM) using TS-PRED as local search; support for multiple processor types; improved preprocessing and lower bound computations. AI also suggested adaptive parameter control and multi-objective extensions as natural directions.",
+      "verification": {
+        "actions": [
+          "Verified MA|PM extension against Section 4 (Conclusions) of Sevaux et al. (2011), p. 211. Confirmed multiple processor type extension from the same conclusions section. Confirmed improved lower bounds direction from the conclusions section. Adaptive parameter control and multi-objective extensions are not in the paper — kept as independently identified directions."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "AI presented all extensions as if they were from the paper. Revised to clearly separate author-proposed extensions (Section 4 of the paper) from independently identified extensions. This distinction is important for academic integrity."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 5 (Proposed Extensions)",
+        "usage_type": "idea-generation",
+        "direct_text_reused": false
+      },
+      "reflection": "Distinguishing between what the authors themselves propose and what can be independently derived from the limitations analysis is an important scientific habit. AI blurred this boundary and it had to be corrected manually."
+    }
+  ],
+  "exported_at": "2026-06-14T14:40:45+00:00"
+}
