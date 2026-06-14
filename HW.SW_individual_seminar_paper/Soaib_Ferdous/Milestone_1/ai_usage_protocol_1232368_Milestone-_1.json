@@ -1,0 +1,106 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "1232368",
+  "course": "Hw/SW CoDesign",
+  "milestone": "Milestone- 1",
+  "topic": "High-Level Synthesis with Tabu Search Scheduling",
+  "entries": [
+    {
+      "id": "e-0ad6cbe9",
+      "timestamp": "2026-06-14T12:23:12+00:00",
+      "parent_id": null,
+      "objective": "Understand the HLS scheduling problem context and identify the formal problem formulation from the main reference (Sevaux et al. 2011).",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "Claude-sonnet-4.6"
+      },
+      "prompt": "What is the formal problem definition for multiprocessor scheduling in High-Level Synthesis as described by Sevaux, Singh and Rossi (2011)? Include job parameters, constraints and objective.",
+      "ai_output_summary": "AI described the scheduling problem with n jobs on identical parallel processors, each job having release date r_i, due date d_i, processing time p_i and predecessor set PRED_i. Objective is to minimise number of processors m. Outlined time-window, capacity, precedence and binary constraints.",
+      "verification": {
+        "actions": [
+          "Checked all parameters and constraint formulations directly against Section 1 and Section 2.1 of Sevaux et al. (2011), pp. 201-203. Confirmed job parameter definitions and ILP constraint structure match the paper exactly."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI initially omitted the binary variable constraint C4 and did not include the time horizon formula H = max(d_j - p_j). Both were added manually after checking the paper."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 4 (Formal Problem Definition)",
+        "usage_type": "summarization",
+        "direct_text_reused": false
+      },
+      "reflection": "Checking the paper directly revealed two missing constraints. This confirmed that AI output must always be validated against the primary source before use in formal notation."
+    },
+    {
+      "id": "e-67d1c6a1",
+      "timestamp": "2026-06-14T12:23:12+00:00",
+      "parent_id": null,
+      "objective": "Establish the NP-hardness argument and understand why exact methods are insufficient for large HLS instances.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "Claude-sonnet-4.6"
+      },
+      "prompt": "Explain why the multiprocessor scheduling problem for HLS is NP-hard, including the reduction from bin packing. Also explain why no PTAS is known.",
+      "ai_output_summary": "AI explained that setting all release dates to zero and all due dates to a common value reduces the problem to 1D bin packing (NP-hard per Garey and Johnson 1979). Version 2 with precedence constraints is also NP-hard as Version 1 is a special case. Stated no known PTAS or performance-guaranteed algorithm exists.",
+      "verification": {
+        "actions": [
+          "Verified reduction argument against Section 1 of Sevaux et al. (2011), p. 202. Checked that Garey and Johnson (1979) citation is correctly attributed. Confirmed the statement about no PTAS matches the paper's own claim."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "None — argument matched the paper precisely."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 5 (Complexity)",
+        "usage_type": "terminology-clarification",
+        "direct_text_reused": false
+      },
+      "reflection": "The NP-hardness reduction is the key justification for using Tabu Search instead of exact methods. Understanding this argument is essential for defending design choices in later milestones."
+    },
+    {
+      "id": "e-56d83d04",
+      "timestamp": "2026-06-14T12:23:12+00:00",
+      "parent_id": null,
+      "objective": "Map the abstract scheduling problem formulation to the HLS hardware context and clarify what jobs, processors and time steps represent.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "Claude-sonnet-4.6"
+      },
+      "prompt": "How does the abstract multiprocessor scheduling formulation map onto High-Level Synthesis? What do jobs, processors and time steps represent in the HLS context?",
+      "ai_output_summary": "AI explained that operations in a behavioural description map to jobs, functional units such as adders and multipliers map to processors, and clock cycles map to discrete time steps. Output of HLS is an RTL netlist where each component can be a VHDL entity.",
+      "verification": {
+        "actions": [
+          "Verified HLS context description against the course slides (Prof. Rettberg, HSHL, 03.06.26) and the introduction of Sevaux et al. (2011), p. 201. RTL and VHDL mapping confirmed against the course elaboration requirements slide."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI described processors as general compute units without specifying that in HLS they are identical parallel functional units. Corrected this in the submitted text to match the paper's assumption."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (Context: High-Level Synthesis)",
+        "usage_type": "terminology-clarification",
+        "direct_text_reused": false
+      },
+      "reflection": "Verifying against both the paper and course slides clarified the identical-processor assumption which is a key constraint of the model and must be stated explicitly in the milestone."
+    }
+  ],
+  "exported_at": "2026-06-14T12:23:12+00:00"
+}
