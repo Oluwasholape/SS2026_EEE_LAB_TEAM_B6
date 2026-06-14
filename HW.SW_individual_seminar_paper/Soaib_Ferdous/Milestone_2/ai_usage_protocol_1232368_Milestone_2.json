@@ -1,0 +1,138 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "1232368",
+  "course": "HW/SW CoDesign",
+  "milestone": "Milestone 2",
+  "topic": "High-Level Synthesis with Tabu Search Scheduling",
+  "entries": [
+    {
+      "id": "e-0923f084",
+      "timestamp": "2026-06-14T14:23:37+00:00",
+      "parent_id": null,
+      "objective": "Understand the three phases of TS-PRED and how preprocessing tightens release and due dates using precedence constraints.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude sonnet 4.6"
+      },
+      "prompt": "Explain the preprocessing phase of the TS-PRED Tabu Search algorithm for HLS scheduling as described by Sevaux et al. (2011). How does it tighten release dates and due dates using precedence constraints?",
+      "ai_output_summary": "AI described a two-pass critical path computation. Forward pass computes earliest start times; if EST exceeds release date, release date is updated. Backward pass computes latest completion times; if LCT is less than due date, due date is updated. This reduces the feasible search space and identifies infeasible instances early.",
+      "verification": {
+        "actions": [
+          "Verified forward and backward pass logic against Section 2.2.1 of Sevaux et al. (2011), p. 204. Confirmed that the method is described as analogous to critical path computations in the paper. Checked that the benefit of identifying infeasible instances early is explicitly stated in the paper."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI did not clearly distinguish the forward and backward pass directions. Restructured manually into two explicit passes with update rules for clarity in the milestone."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (Phase 1 — Preprocessing)",
+        "usage_type": "summarization",
+        "direct_text_reused": false
+      },
+      "reflection": "The preprocessing phase is not just an optimisation detail — it is essential for making TS-PRED practical on large instances. Understanding the critical path analogy helped clarify why this step significantly reduces the search space."
+    },
+    {
+      "id": "e-444f3d78",
+      "timestamp": "2026-06-14T14:23:37+00:00",
+      "parent_id": null,
+      "objective": "Understand the initial solution generation procedure and how topological ordering is used.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "How does TS-PRED generate its initial feasible solution? Explain the role of topological ordering of the precedence DAG and how jobs are allocated to processors iteratively.",
+      "ai_output_summary": "AI explained that jobs are numbered in topological order so that each job's number is higher than all its predecessors. At each iteration, the lowest-numbered job with all predecessors allocated is selected. It is inserted at the position minimising idle time. If no processor can accommodate it, a new one is added. Start time is always the earliest feasible time.",
+      "verification": {
+        "actions": [
+          "Verified all steps against Section 2.2.2 of Sevaux et al. (2011), p. 205. Confirmed that once allocated, a job cannot be moved during initial solution generation — this constraint is explicitly stated in the paper and was correctly captured by the AI."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "None — description matched the paper precisely."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (Phase 2 — Initial Solution Generation)",
+        "usage_type": "summarization",
+        "direct_text_reused": false
+      },
+      "reflection": "The topological ordering ensures that precedence constraints are never violated during construction. This is a simple but important design choice that makes the greedy construction always produce a valid initial solution."
+    },
+    {
+      "id": "e-f31e96d4",
+      "timestamp": "2026-06-14T14:23:37+00:00",
+      "parent_id": null,
+      "objective": "Clarify the tabu search procedure including perturbation methods, insertion, exchange operations and tabu tenure formula.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Explain the main Tabu Search procedure of TS-PRED in detail: the two perturbation methods, how unallocated jobs are reinserted via insertion and exchange operations, and the tabu tenure formula.",
+      "ai_output_summary": "AI described two perturbation methods (random processor removal and probabilistic job removal with p_rem=0.2). For reallocation: insertion tries to place the job by pushing others using ECT and LST; exchange swaps the job with shorter consecutive jobs whose schedules overlap. Tabu tenure is max{3, ceil(n/m)}. If neither insertion nor exchange works, a new processor is added.",
+      "verification": {
+        "actions": [
+          "Verified both perturbation methods against Section 2.2.3 of Sevaux et al. (2011), pp. 205-206. Confirmed tabu tenure formula max{3, ceil(n/m)} from p. 208 of the paper. Verified the exchange condition (only when processing time of consecutive job is less than unallocated job) from p. 206."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI initially omitted the condition that exchange is only performed when the processing time of each consecutively allocated job is less than the unallocated job. This is a key difference from TS-SS and was added manually after checking the paper."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (Phase 3 — Tabu Search Procedure)",
+        "usage_type": "terminology-clarification",
+        "direct_text_reused": false
+      },
+      "reflection": "The exchange condition (shorter processing time only) is a deliberate design choice motivated by the idea that shorter jobs are easier to reschedule. Missing this detail would have made the algorithm description inaccurate compared to the paper."
+    },
+    {
+      "id": "e-5573437f",
+      "timestamp": "2026-06-14T14:23:37+00:00",
+      "parent_id": null,
+      "objective": "Compare TS-PRED with TS-SS and identify the key algorithmic differences and performance improvements.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "What are the key algorithmic differences between TS-PRED and TS-SS (Sevaux and Sorensen 2007)? How does TS-PRED improve solution quality and runtime compared to TS-SS?",
+      "ai_output_summary": "AI identified five main differences: TS-PRED supports precedence constraints while TS-SS does not; TS-PRED uses a reverse approach starting from a feasible solution rather than building up from a lower bound; TS-PRED uses a move-based tabu criterion rather than sum of processing times; TS-PRED adds an exchange condition restricting to shorter jobs; TS-PRED includes preprocessing. Performance: TS-PRED deviation 1.24% vs 5.45% for TS-SS at n=100.",
+      "verification": {
+        "actions": [
+          "Verified performance figures against Table 2 of Sevaux et al. (2011), p. 209. Checked the algorithmic differences against Sections 2.2 and 4 of the paper. Confirmed that TS-SS data in Table 2 is taken from Sevaux and Sorensen (2007) as stated in the paper."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI stated TS-PRED is always faster without qualification. Corrected to state that speed advantage grows with n, as reported in the paper's conclusions."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3 (Comparison: TS-PRED vs TS-SS)",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "Comparing the two methods clarified why TS-PRED is the contribution of this paper and not just an incremental change. The reverse approach and precedence support are the two most important novelties."
+    }
+  ],
+  "exported_at": "2026-06-14T14:23:37+00:00"
+}
