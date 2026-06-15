@@ -11,7 +11,5 @@ Hochschule Hamm-Lippstadt
 - Oyemade, Oluwasholape Daniel
 
 ## Repository Structure
+- [lab](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/lab): Cross traffic management
 - [Seminar](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/seminar): Individual seminar papers of each group member, based on their given topics
-- [Requirements](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/task1_requirements): Use case diagram
-- [Modelling](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/task2_modelling): UPPAAL Timed Automata, sequence diagrams, activity diagrams
-- [Implementation](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/task3_implementation): C-code with freeRTOS. Well defined mapping from models
