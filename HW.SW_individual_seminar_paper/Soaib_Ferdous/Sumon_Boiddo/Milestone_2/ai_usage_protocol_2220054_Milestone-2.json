@@ -1,0 +1,106 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "2220054",
+  "course": "Special Emphasis-Real_Time_Systems",
+  "milestone": "Milestone-2",
+  "topic": "Improved Priority Exchange Server",
+  "entries": [
+    {
+      "id": "e-5a6b7c8d",
+      "timestamp": "2026-06-14T00:00:00+00:00",
+      "parent_id": null,
+      "objective": "Place IPE within the landscape of aperiodic servers and understand how it compares with its closest neighbours (PE, DPE, EDL, TBS).",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-opus-4-8"
+      },
+      "prompt": "Through a step-by-step question-and-answer session, help me identify the two server families (fixed-priority RM and dynamic-priority EDF), place IPE in the EDF family with its PE -> DPE -> IPE lineage, and compare IPE with PE, DPE, EDL, and TBS on scheduler, responsiveness, and main limitation.",
+      "ai_output_summary": "Claude guided the comparison one question at a time. I provided my own understanding for each step, and Claude organized my answers into the landscape overview, the comparison table, and the four pairwise comparisons. The technical details were taken from Buttazzo, Chapter 6.",
+      "verification": {
+        "actions": [
+          "Cross-checked the comparison claims against the primary reference, Buttazzo, Hard Real-Time Computing Systems, Chapter 6 (Dynamic Priority Servers)."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The PE, DPE, and TBS limitation entries in the table were filled in from the textbook, since the questions focused mainly on EDL and IPE."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 1 (Overview of the Aperiodic Server Landscape), Section 2 (Comparison Table), and Section 3 (Detailed Comparison)",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": true
+      },
+      "reflection": "The guided question-and-answer process helped me organize how IPE relates to the other servers. The comparison ideas came from me; the AI added the precise technical details from the textbook and structured them. I confirmed the claims against the book before accepting them."
+    },
+    {
+      "id": "e-6b7c8d9e",
+      "timestamp": "2026-06-14T00:00:00+00:00",
+      "parent_id": "e-5a6b7c8d",
+      "objective": "Analyse the scientific and engineering trade-offs of IPE.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-opus-4-8"
+      },
+      "prompt": "Help me express the trade-offs of IPE: optimality vs. practicality, run-time cost vs. memory cost, performance vs. flexibility, and near-optimal performance vs. simplicity.",
+      "ai_output_summary": "I described the gains and costs of IPE (near-optimal speed gained; memory and the need for a known static task set paid). Claude organized these into four labelled trade-offs and corrected a point where I confused run-time cost (which is lower) with memory cost (which is higher).",
+      "verification": {
+        "actions": [
+          "Checked the run-time-versus-memory distinction and the optimality-versus-practicality argument against Buttazzo, Chapter 6."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "I initially mixed up run-time cost and memory cost; this was corrected during the discussion and verified against the book."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 4 (Scientific and Engineering Trade-offs)",
+        "usage_type": "idea-generation",
+        "direct_text_reused": true
+      },
+      "reflection": "This helped me clearly separate what IPE gains from what it gives up. The trade-off ideas were mine; the AI helped me phrase them correctly and fixed a mistake I had made about memory versus run-time cost."
+    },
+    {
+      "id": "e-7c8d9e0f",
+      "timestamp": "2026-06-14T00:00:00+00:00",
+      "parent_id": "e-5a6b7c8d",
+      "objective": "Determine the consequences of IPE for embedded systems and decide which related work to exclude.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-opus-4-8"
+      },
+      "prompt": "Help me work out what an embedded system needs to run IPE (EDF scheduler plus offline precomputation), the consequence of its memory cost on small devices, and which related servers (such as CBS) should be excluded from deep study and why.",
+      "ai_output_summary": "I reasoned that IPE needs an EDF scheduler and an offline step to compute and store the E/D arrays, and that on small devices the memory cost is a problem for non-harmonic periods. I also decided to exclude CBS because it is not part of my topic and follows a different design. Claude organized these points into the embedded-consequences and excluded-work sections.",
+      "verification": {
+        "actions": [
+          "Checked the OS-support and memory-constraint points against Buttazzo, Chapter 6, and confirmed that CBS belongs to a different server family."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The embedded examples were kept general and not tied to a specific commercial RTOS."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 5 (Embedded Systems Consequences) and Section 6 (Why Some Related Work Is Excluded)",
+        "usage_type": "idea-generation",
+        "direct_text_reused": true
+      },
+      "reflection": "I decided the scope of the paper myself (focusing on IPE's own family and excluding CBS), and the AI helped me state the embedded consequences and scoping decisions clearly, with details from the textbook."
+    }
+  ],
+  "exported_at": "2026-06-14T00:00:00+00:00"
+}
