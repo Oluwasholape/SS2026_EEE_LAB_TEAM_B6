@@ -1,1 +1,3 @@
 # Individual seminar papers of each group member, based on their given topics for both [HW/SW Co-design](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/seminar/HWSW_Codesign) and [RTS Seminar](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/seminar/Real-Time_Systems)
+
+Including all milestones and deliverables
