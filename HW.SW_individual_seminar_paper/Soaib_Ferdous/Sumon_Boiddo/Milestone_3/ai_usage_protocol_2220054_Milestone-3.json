@@ -1,0 +1,106 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "2220054",
+  "course": "Special Emphasis-Real_Time_Systems",
+  "milestone": "Milestone-3",
+  "topic": "Improved Priority Exchange Server",
+  "entries": [
+    {
+      "id": "e-9a0b1c2d",
+      "timestamp": "2026-06-14T00:00:00+00:00",
+      "parent_id": null,
+      "objective": "Critically evaluate the concrete strengths and limitations (and risks) of the IPE server, rather than listing generic advantages.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-opus-4-8"
+      },
+      "prompt": "Through a step-by-step question-and-answer session, help me identify the concrete strengths of IPE (near-optimal speed close to EDL, low run-time overhead, no wasted CPU time, the Up <= 1 guarantee) and its concrete limitations and risks (high memory for non-harmonic periods, static task set, EDF requirement, complexity, not fully optimal).",
+      "ai_output_summary": "Claude guided the evaluation one question at a time. I listed the strengths and limitations from my own understanding (built in Milestones 1 and 2), and Claude organized them and added the precise technical wording from Buttazzo, Chapter 6.",
+      "verification": {
+        "actions": [
+          "Cross-checked the strengths and limitations against the primary reference, Buttazzo, Hard Real-Time Computing Systems, Chapter 6."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The strengths and limitations build on the understanding developed in Milestones 1 and 2; the EDF-requirement limitation was added during the discussion."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 1 (Concrete Strengths) and Section 2 (Concrete Limitations and Risks)",
+        "usage_type": "idea-generation",
+        "direct_text_reused": true
+      },
+      "reflection": "The strengths and limitations came from my own understanding of IPE; the AI helped me phrase them as concrete points and added the exact technical terms from the textbook, which I verified."
+    },
+    {
+      "id": "e-0b1c2d3e",
+      "timestamp": "2026-06-14T00:00:00+00:00",
+      "parent_id": "e-9a0b1c2d",
+      "objective": "Identify the hidden or unrealistic assumptions of IPE and analyse its run-time and memory scalability.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-opus-4-8"
+      },
+      "prompt": "Help me identify which IPE assumptions may be unrealistic in real systems (dynamic task set, multi-core, accurate WCET, full preemption, implicit deadlines) and analyse how IPE's run-time cost and memory cost scale as the system grows.",
+      "ai_output_summary": "I reasoned that real systems can be dynamic and multi-core, that WCET is hard to know exactly, and that execution times vary; and that IPE's run-time cost stays low (offline work) while its memory cost grows quickly with the hyperperiod. Claude organized these into the assumptions and scalability sections, with details from Buttazzo.",
+      "verification": {
+        "actions": [
+          "Checked the assumptions and the run-time-versus-memory scalability behaviour against Buttazzo, Chapter 6."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The full-preemption and implicit-deadline assumptions were added from the textbook to complete the list."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3 (Hidden or Unrealistic Assumptions) and Section 4 (Scalability Analysis)",
+        "usage_type": "idea-generation",
+        "direct_text_reused": true
+      },
+      "reflection": "I identified the unrealistic assumptions and the memory-versus-run-time scalability myself; the AI helped me state them clearly and completely using the textbook."
+    },
+    {
+      "id": "e-1c2d3e4f",
+      "timestamp": "2026-06-14T00:00:00+00:00",
+      "parent_id": "e-9a0b1c2d",
+      "objective": "Choose suitable and unsuitable application scenarios for IPE and propose meaningful extensions and open research questions.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-opus-4-8"
+      },
+      "prompt": "Help me work out a suitable embedded scenario for IPE and an unsuitable one, and propose extensions (reduced-memory IPE, multi-core IPE, adaptive IPE, robust IPE) and open questions.",
+      "ai_output_summary": "I chose a robot/motor controller as a suitable scenario (fixed harmonic periodic tasks plus soft aperiodic commands) and a fixed-priority AUTOSAR ECU as an unsuitable one, and proposed reduced-memory, multi-core, adaptive, and robust IPE as extensions. Claude organized these and anchored the unsuitable example to a concrete AUTOSAR ECU, with details from the textbook.",
+      "verification": {
+        "actions": [
+          "Confirmed that AUTOSAR uses fixed-priority scheduling (so IPE cannot run there) and that the suitable-scenario reasoning matches IPE's requirements as described in Buttazzo, Chapter 6."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The application examples were kept general and not tied to a specific commercial product."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 5 (Suitable Scenario), Section 6 (Unsuitable Scenario), and Section 7 (Extensions and Open Questions)",
+        "usage_type": "idea-generation",
+        "direct_text_reused": true
+      },
+      "reflection": "I selected the scenarios and the extensions myself, based on IPE's strengths and limitations; the AI helped me express them and add a concrete example for the unsuitable case."
+    }
+  ],
+  "exported_at": "2026-06-14T00:00:00+00:00"
+}
