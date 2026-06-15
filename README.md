@@ -11,5 +11,5 @@ Hochschule Hamm-Lippstadt
 - Oyemade, Oluwasholape Daniel
 
 ## Repository Structure
-- [Lab](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/lab): Cross traffic management
+- [Lab](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/lab): Cross traffic management for Embedded Electronic Lab A
 - [Seminar](https://github.com/Oluwasholape/SS2026_EEE_LAB_TEAM_B6/tree/main/seminar): Individual seminar papers of each group member, based on their given topics
