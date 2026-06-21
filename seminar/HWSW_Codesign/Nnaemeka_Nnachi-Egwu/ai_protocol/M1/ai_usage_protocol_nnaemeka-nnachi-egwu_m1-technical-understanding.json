@@ -1,0 +1,115 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "nnaemeka-nnachi-egwu",
+  "course": "HW/SW Co-Design Seminar",
+  "milestone": "M1: Technical Understanding",
+  "topic": "High-Level Synthesis with Ant Colony Optimization Scheduling",
+  "exported_at": "2026-06-04T18:00:00+02:00",
+  "entries": [
+    {
+      "id": "e-a1b2c3d4",
+      "timestamp": "2026-06-02T10:14:00+02:00",
+      "parent_id": null,
+      "objective": "I just downloaded the Kopuri & Mansouri 2004 paper and I couldn't parse the garbled OCR equations. I wanted to understand what FDS actually does before trying to understand the modification they propose.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "can you explain Force-Directed Scheduling in HLS - like the basic idea and why the self-force equation makes sense intuitively? I'm trying to understand what q_k(l) physically represents before I read this paper about adding ACO to it",
+      "ai_output_summary": "Claude explained that q_k(l) is the expected number of type-k operations concurrently active at time-step l, computed as a sum of uniform probabilities over each unscheduled op's time frame. The self-force S_il measures how much scheduling op i at time l would push the concurrency above the average -- positive self-force means it increases the peak, negative means it flattens it. The goal is to pick the assignment with the lowest total force to spread load evenly.",
+      "verification": {
+        "actions": [
+          "Cross-checked the q_k definition against Eq. 1 on page V-258 of the paper image.",
+          "Confirmed that p_i(m) = 1/(alap - asap + 1) is the uniform distribution over the time frame.",
+          "The Kronecker delta interpretation (point mass at l when scheduled) matched visually."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (FDS Baseline)",
+        "usage_type": "terminology-clarification",
+        "direct_text_reused": false
+      },
+      "reflection": "This interaction gave me a clean mental model before reading the actual equations. The AI got the substance right but I still had to go to the paper page image to confirm the exact form -- the OCR text had garbled subscripts."
+    },
+    {
+      "id": "e-b2c3d4e5",
+      "timestamp": "2026-06-02T14:30:00+02:00",
+      "parent_id": "e-a1b2c3d4",
+      "objective": "I needed to transcribe Equation 5 (the modified force) from the paper page image. The denominator looked like a square root of a sum but I wasn't sure if it was an RMS normalisation or something else.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "Looking at the paper's equation 5 it shows F_il = alpha * S_il / (something under a square root) - beta * M_il - gamma * G_il. The thing under the square root looks like (1/N*lambda) * sum of all S_ij. Is that an RMS normalisation?",
+      "ai_output_summary": "Claude confirmed that sqrt((1/(N*lambda)) * sum S_ij^2) would be a standard RMS, but from the image description I gave, the paper appears to use sqrt((1/N*lambda) * sum S_ij) without squaring -- making it a scaled sum, not a true RMS. Claude said this is an unusual normalisation and suggested I verify the exponent directly from the image.",
+      "verification": {
+        "actions": [
+          "Zoomed into page 3 image at the denominator of Eq. 5.",
+          "The sum contains S_ij without a squared exponent -- it is sum of S_ij not sum of S_ij^2.",
+          "This means the denominator is sqrt((1/N*lambda) * sum_all S_ij), which is not a true RMS.",
+          "Claude's initial framing as RMS was therefore imprecise -- the formula is printed as given."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI framed the denominator as RMS but the paper does not square S_ij inside the sum.",
+          "The word 'RMS-type' is my own interpretation; the paper just calls it the normalised self-force."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 3 (Force Equation, Eq. 5)",
+        "usage_type": "verification-support",
+        "direct_text_reused": false
+      },
+      "reflection": "The AI was useful for prompting me to check the exponent, but I had to go back to the image to settle the question. The transcription I trust now is from direct visual inspection of the page, not from the AI. This is an example where the AI was a good thinking partner but not a reliable source for fine equation details."
+    },
+    {
+      "id": "e-c3d4e5f6",
+      "timestamp": "2026-06-03T09:00:00+02:00",
+      "parent_id": "e-b2c3d4e5",
+      "objective": "After transcribing all five equations I noticed something odd: the trail update in Eq. 3 subtracts cost(s^o) from cost(s), which gives a negative number when s is better. But Eq. 5 subtracts the trail term. I wanted to check if this creates an anti-reinforcement effect.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "ok so in equation 3 the trail update is M_ij += (cost(s) - cost(s^o)) / cost(s^o). If s is better, cost(s) < cost(s^o) so the increment is negative. Then in eq 5 we subtract beta*M_il. So a more negative M_il means we ADD a bigger thing to F_il which makes the force HIGHER. But A_FDS picks minimum force... so improved decisions get higher force = less likely to be picked again? did I get that wrong?",
+      "ai_output_summary": "Claude confirmed the reasoning: yes, as printed the equations anti-reinforce improved decisions. It suggested two possible corrections: negate the increment in Eq. 3, or change the sign in Eq. 5 to +beta*M. It also noted that the benchmarks showing improvement despite this could be explained by the self-force term dominating, with trail terms acting as a weak diversification mechanism.",
+      "verification": {
+        "actions": [
+          "Traced numerical example: cost(s^o)=1000, cost(s)=900 -> increment = -0.10.",
+          "With beta=2: contribution to F_il is -2*(-0.10) = +0.20, raising the force.",
+          "Confirmed: A_FDS selects minimum force, so higher force = less likely selected.",
+          "Re-read the prose on page V-259: 'trail is positive or negative depending on whether improved results are obtained.' Mathematically it is always negative for improvement.",
+          "The inconsistency is real and verified numerically and by close reading."
+        ],
+        "level": "methodological-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Paper prose and equations are inconsistent regarding sign convention.",
+          "No source code available to verify actual implementation intent."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 4 (Sign-Convention Analysis) in M4; Open Questions in M1",
+        "usage_type": "argument-critique",
+        "direct_text_reused": false
+      },
+      "reflection": "This was the most significant reasoning episode of M1. The AI confirmed my suspicion rather than generating it -- I had noticed the sign issue myself from reading the equations, and used the AI as a sanity check. The numerical trace I did by hand was the real validation. The AI's suggestion that diversification might explain the benchmark results is a reasonable hypothesis I included in M3 and M4."
+    }
+  ]
+}
