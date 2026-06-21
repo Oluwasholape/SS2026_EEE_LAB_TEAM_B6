@@ -1,0 +1,114 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "nnaemeka-nnachi-egwu",
+  "course": "HW/SW Co-Design Seminar",
+  "milestone": "M3: Critical Evaluation",
+  "topic": "High-Level Synthesis with Ant Colony Optimization Scheduling",
+  "exported_at": "2026-06-09T18:00:00+02:00",
+  "entries": [
+    {
+      "id": "e-g7h8i9j0",
+      "timestamp": "2026-06-08T10:00:00+02:00",
+      "parent_id": null,
+      "objective": "For M3 I wanted to systematically think through the experimental weaknesses of the paper -- specifically whether the benchmark results are statistically meaningful given that ACO is stochastic and only single runs are reported.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "the paper only reports one result per benchmark configuration. ACO is stochastic so results vary by random seed. how serious is this for evaluating whether A_FDS is actually better than FDS? what would a proper statistical evaluation require?",
+      "ai_output_summary": "Claude said this is a significant methodological weakness: without multiple runs, you cannot tell if the reported improvement is representative or lucky. A minimal valid evaluation would require 30 runs per configuration, reporting mean and standard deviation, then using a Wilcoxon signed-rank test (non-parametric, appropriate for small samples and non-normal cost distributions) to test whether A_FDS is significantly better than FDS. It also noted that the Differential Equation benchmark showing zero improvement could be explained by the FDS solution already being at a local optimum for that graph.",
+      "verification": {
+        "actions": [
+          "The ACO literature (Dorigo 1992 and standard optimization textbooks) does require multiple runs for stochastic algorithms -- AI's framing is standard.",
+          "The specific recommendation of 30 runs and Wilcoxon test is AI's suggestion, not from the paper -- I used it as background knowledge without attributing it to the paper.",
+          "The zero-improvement hypothesis for Differential Equation is my own inference; AI's suggestion about local optimum is one of three hypotheses I list in M3."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The AI's statistical recommendation is standard but goes beyond what the paper requires -- I used it to frame the limitation, not as a requirement I'm imposing retroactively."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (Critical Assessment of Experimental Methodology) in M3",
+        "usage_type": "argument-critique",
+        "direct_text_reused": false
+      },
+      "reflection": "This was a useful structuring conversation. The statistical framing gave me a concrete vocabulary for the criticism. I made sure not to present Wilcoxon as something the paper should have done by its standards -- the paper is from 2004 and the field's reporting standards were different."
+    },
+    {
+      "id": "e-h8i9j0k1",
+      "timestamp": "2026-06-08T14:00:00+02:00",
+      "parent_id": "e-g7h8i9j0",
+      "objective": "I wanted to think about where A_FDS would actually be useful in a real embedded systems project -- not just in theory, but with concrete scenarios.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "give me concrete examples where ACO-based HLS scheduling would be genuinely useful vs where it would be the wrong tool. I want real scenarios, not just 'arithmetic intensive circuits are good.' I'm writing a critical evaluation for a seminar paper",
+      "ai_output_summary": "Claude gave: suitable -- ASIC FFT engine with tight area budget, video codec datapath where latency is fixed by protocol (H.264 macroblock timing). Unsuitable -- automotive safety-critical FSM (need formal timing guarantees that stochastic scheduler cannot provide), memory-bandwidth-bound ML inference accelerator (cost model doesn't capture DRAM bottleneck), embedded Rust firmware (HLS of control-flow code doesn't match the fixed-latency assumption). It also suggested FPGA as borderline -- depends on whether you replace the cost model.",
+      "verification": {
+        "actions": [
+          "The formal timing guarantee argument is correct: stochastic schedulers cannot prove WCET bounds; this is a well-known property.",
+          "The DRAM bandwidth observation matches the paper's own limitation: 'cost of resources might not necessarily be dominant' in DSM -- consistent.",
+          "The H.264 example is plausible but specific -- I kept it generic in M3 (video codec) rather than naming a specific standard I didn't verify."
+        ],
+        "level": "plausibility-check"
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI's suggestion of 'Rust firmware' was slightly off-topic -- HLS is for hardware description, not software firmware. I excluded it.",
+          "The FPGA borderline case is well-reasoned; I included it as a paragraph in M3."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 5 (Application Suitability) in M3 and M4",
+        "usage_type": "idea-generation",
+        "direct_text_reused": false
+      },
+      "reflection": "The AI generated more concrete examples than I had on my own. I filtered out the ones I couldn't verify (specific codec timings) and kept the ones grounded in properties I could confirm independently (stochastic vs. deterministic, cost model mismatch)."
+    },
+    {
+      "id": "e-i9j0k1l2",
+      "timestamp": "2026-06-09T09:30:00+02:00",
+      "parent_id": null,
+      "objective": "I needed to verify my sign-convention analysis numerically and think about what it means that the benchmarks improve despite the anti-reinforcement.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "so if the sign in eq 3 gives anti-reinforcement, why do the benchmarks still improve over FDS? is there a mathematical reason or is it just that the self-force term dominates and the trail barely matters?",
+      "ai_output_summary": "Claude gave three hypotheses: (1) self-force dominance -- alpha*S_il/norm dominates for alpha=1, beta=gamma=2 when trail values are small (they start at 0); (2) diversification -- anti-reinforcement spreads ants across different schedules, effectively sampling more of the space than FDS's greedy single path; (3) lucky parameters -- beta and gamma are small enough that the trail effect is negligible and results are essentially FDS with random perturbation.",
+      "verification": {
+        "actions": [
+          "Checked magnitude: after 1 iteration with cost(s)=900, cost(s^o)=1000, increment = -0.1. With beta=2, contribution to force = +0.2. Self-force S_il is typically of order 0.5-5 for typical distributions; +0.2 is not negligible but could be dominated.",
+          "The diversification hypothesis is plausible -- standard ACO theory says anti-reinforcement is equivalent to exploration. Could not formally verify without code.",
+          "I implemented the corrected sign version in C++ and observed faster convergence -- consistent with hypothesis (1) or (2) being partially correct."
+        ],
+        "level": "empirical-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Hypothesis (3) (lucky parameters) cannot be ruled out without a sweep over beta and gamma values.",
+          "The empirical check from my C++ implementation supports hypothesis (1) or (2) but is based on approximate benchmark CDFGs, not the original ones."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 4 (Sign-Convention Analysis) in M4; Section 2 in M3",
+        "usage_type": "argument-critique",
+        "direct_text_reused": false
+      },
+      "reflection": "This was genuinely collaborative reasoning -- I brought the finding and the AI helped me articulate three distinct explanations that I could evaluate independently. All three ended up in the final paper as competing explanations, which I think is more honest than picking one."
+    }
+  ]
+}
