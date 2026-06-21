@@ -1,0 +1,110 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "nnaemeka-nnachi-egwu",
+  "course": "HW/SW Co-Design Seminar",
+  "milestone": "M2: Scientific Contextualization",
+  "topic": "High-Level Synthesis with Ant Colony Optimization Scheduling",
+  "exported_at": "2026-06-07T18:00:00+02:00",
+  "entries": [
+    {
+      "id": "e-d4e5f6g7",
+      "timestamp": "2026-06-05T11:00:00+02:00",
+      "parent_id": null,
+      "objective": "For M2 I needed to place this paper within the HLS scheduling landscape. I knew about FDS and ILP but I was not sure what other meta-heuristic approaches had been tried and how they differed from ACO.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "what scheduling algorithms have been used for HLS besides FDS and ILP? specifically looking for metaheuristic ones like genetic algorithms or simulated annealing. I want to compare them to the ACO approach in this paper",
+      "ai_output_summary": "Claude listed: list scheduling (priority-based, O(N log N)), FDS (force-based, O(N^3)), GA-based (Heijligers 1995 cited in paper), simulated annealing (general), tabu search, and graph-bisection approach (Park & Kyung 1991, cited in paper). It noted that ACO was unusual because most ACO problems are graph traversal (TSP, VRP) whereas HLS scheduling is an assignment problem.",
+      "verification": {
+        "actions": [
+          "Cross-checked the citations mentioned (Heijligers, Park & Kyung) against the reference list in the paper -- both appear in [8] and [9].",
+          "Confirmed that simulated annealing for HLS is not in the paper's references -- consistent with it being excluded from comparison.",
+          "The observation that ACO is unusual for assignment problems (not graph problems) matches the discussion in Section 2 of the paper."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Claude mentioned simulated evolution and InSyn ([10] in paper) but did not initially give the correct citation -- I added the correct cite from the paper's reference list."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Table 1 (Scheduling strategy comparison) in M2",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "The AI gave me a useful landscape overview. The key insight I kept was the observation about ACO being unusual for assignment problems -- this became the main structural observation in my M2 Section 5 about why related work is sparse."
+    },
+    {
+      "id": "e-e5f6g7h8",
+      "timestamp": "2026-06-05T15:45:00+02:00",
+      "parent_id": "e-d4e5f6g7",
+      "objective": "I wanted to characterise the tradeoffs between the scheduling approaches more precisely -- specifically the optimality vs runtime tradeoff and how the paper's approach sits on that spectrum.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "can you help me think through the tradeoff space for HLS schedulers? like for FDS vs ACO-FDS: what does the ACO version gain and what does it cost? I want to be precise about what 'better' means here and not just say 'it gives better results' without saying why that's non-trivial",
+      "ai_output_summary": "Claude identified three main dimensions: (1) optimality guarantee vs practical quality; (2) single-pass vs iterative (runtime trade); (3) model fidelity of the cost function. It pointed out that A_FDS actually reduces per-step complexity from O(N^3) for PS-force to O(N*lambda) but increases total evaluations by n_iter * n_ants = 400, so the total complexity goes up. It also flagged that the cost model is a critical assumption: the tradeoff only makes sense if the cost function is faithful.",
+      "verification": {
+        "actions": [
+          "Verified the O(N^3) for FDS from the paper: 'The FDS algorithm is of the order of O(n^3) time complexity' -- confirmed on page V-258.",
+          "Verified 'all terms in the modified force equation can be calculated in linear time' -- page V-259.",
+          "The 400 total evaluations calculation (20 iters * 20 ants) matches the paper's stated parameters."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 4 (Tradeoff Analysis) in M2",
+        "usage_type": "comparison-structuring",
+        "direct_text_reused": false
+      },
+      "reflection": "The AI structured the tradeoff space well. The most useful output was the observation that the per-step complexity improves but total evaluations increase -- this is a nuance I had missed and it became the core of my complexity discussion."
+    },
+    {
+      "id": "e-f6g7h8i9",
+      "timestamp": "2026-06-06T09:20:00+02:00",
+      "parent_id": null,
+      "objective": "I needed to understand what clique partitioning means in the HLS context since the paper uses it for resource allocation but gives no details.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "the paper says it uses clique partitioning for resource allocation but doesn't explain it. what does clique partitioning actually do in HLS resource allocation and how is it different from just counting operations?",
+      "ai_output_summary": "Claude explained: in the resource allocation compatibility graph, two operations are compatible (can share a functional unit) if they are not scheduled at the same time-step and have the same type. Clique partitioning finds cliques (sets of mutually compatible ops) where each clique maps to one FU instance. For conflict graphs where ops at the same time-step conflict, the number of FUs equals the chromatic number, which for interval graphs equals the size of the maximum clique.",
+      "verification": {
+        "actions": [
+          "Checked: for simple time-step conflict graphs, max concurrent ops of one type = max clique = chromatic number. This is the interval graph property.",
+          "The paper does not give details of its clique partitioning -- this interpretation is consistent with standard HLS textbooks (Teich, Gajski).",
+          "My C++ implementation uses the max-concurrent-at-same-step approach, which is the simplest correct model."
+        ],
+        "level": "secondary-source-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "AI did not mention that the paper's exact variant of clique partitioning is unspecified -- I added this as a limitation in M3."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 2 (HLS Flow Context) in M2; implementation notes",
+        "usage_type": "terminology-clarification",
+        "direct_text_reused": false
+      },
+      "reflection": "Useful clarification. I realised that the paper leaves the allocation step underspecified -- this is a reproducibility issue I flagged in M3."
+    }
+  ]
+}
