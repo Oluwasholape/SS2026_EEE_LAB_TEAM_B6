@@ -1,0 +1,110 @@
+{
+  "protocol_version": "0.2",
+  "student_id": "nnaemeka-nnachi-egwu",
+  "course": "HW/SW Co-Design Seminar",
+  "milestone": "M4: Final Paper",
+  "topic": "High-Level Synthesis with Ant Colony Optimization Scheduling",
+  "exported_at": "2026-06-11T18:00:00+02:00",
+  "entries": [
+    {
+      "id": "e-j0k1l2m3",
+      "timestamp": "2026-06-10T09:00:00+02:00",
+      "parent_id": null,
+      "objective": "Planning the structure of the final 5-page IEEE paper to make sure I integrate M1, M2, and M3 rather than just re-summarising the original paper.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "I need to write a 5 page IEEE paper that integrates my M1 (technical understanding), M2 (contextualization), and M3 (critical evaluation). The main finding I want to highlight is the sign convention issue. What should the section structure look like so it tells a coherent story?",
+      "ai_output_summary": "Claude suggested: Abstract, Introduction (problem + paper structure), Related Work (M2 content, brief), FDS Baseline (M1 equations), ACO-Enhanced Scheduling (M1 algorithms + equations), Sign-Convention Analysis (M3 central finding), Benchmark Evaluation + Embedded Systems Discussion (M3 suitability), Implementation (C++ + VHDL), Conclusion. It advised leading the sign convention section early, not burying it at the end, to frame the paper as a critical re-evaluation rather than just a summary.",
+      "verification": {
+        "actions": [
+          "Checked proposed structure against M1-M3 checklists -- all checklist items are covered.",
+          "Verified that the section ordering integrates the milestones logically rather than sequentially.",
+          "Confirmed 5-page fit in IEEEtran by test compilation."
+        ],
+        "level": "plausibility-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "AI initially put Sign-Convention after Benchmark Evaluation -- I moved it before to make the paper structure more logical (motivation -> method -> critique -> results)."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Overall structure of M4",
+        "usage_type": "idea-generation",
+        "direct_text_reused": false
+      },
+      "reflection": "The structural suggestion was useful but I made one key modification: moving the sign-convention section earlier. This better reflects the actual contribution of the seminar work (critical analysis) vs. the original paper (algorithm proposal)."
+    },
+    {
+      "id": "e-k1l2m3n4",
+      "timestamp": "2026-06-10T11:30:00+02:00",
+      "parent_id": "e-j0k1l2m3",
+      "objective": "Drafting the abstract for M4. I wanted it to accurately state the paper's contribution without overclaiming, and to flag the sign-convention finding as a contribution of the seminar work.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "draft an abstract for a 5-page IEEE seminar paper on the Kopuri-Mansouri 2004 ACO scheduling paper. Main contributions of my paper: (1) detailed analysis of the algorithm including all equations verified from source, (2) identification of a sign-convention inconsistency in Eq. 3 vs the prose, (3) C++ implementation and VHDL example. Keep it under 150 words",
+      "ai_output_summary": "Claude drafted an abstract mentioning HLS scheduling, FDS, the ACO modification, iterative synthesis loop, and the three contributions. The draft was around 130 words. It used the phrase 'sign-convention inconsistency' and correctly described the anti-reinforcement effect.",
+      "verification": {
+        "actions": [
+          "Verified all factual claims in the abstract against the paper and my own analysis.",
+          "Checked that the benchmark results mentioned (equal to or lower cost) are accurate.",
+          "Confirmed that 'equal to or lower' is the correct characterisation of Table 4 -- all 8 cases show A_FDS <= FDS."
+        ],
+        "level": "primary-source-check"
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "AI draft used the phrase 'demonstrates that A_FDS outperforms FDS' -- this overclaims because the Differential Equation benchmark shows no improvement. Changed to 'yields costs equal to or lower than FDS.'",
+          "AI draft said 'rigorous mathematical analysis' -- I softened to 'critical analysis' since the sign finding is based on reading, not formal proof."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Abstract of M4",
+        "usage_type": "text-revision",
+        "direct_text_reused": false
+      },
+      "reflection": "The draft needed two corrections: one for accuracy (not all benchmarks improve) and one for scope (not a formal proof, just close reading). Both corrections came from checking against the actual Table 4 data and being honest about what the sign-convention finding actually establishes. I rewrote the abstract substantially before it reflected my actual claims."
+    },
+    {
+      "id": "e-l2m3n4o5",
+      "timestamp": "2026-06-10T16:00:00+02:00",
+      "parent_id": null,
+      "objective": "Writing the Conclusion for M4. I wanted to state the sign-convention finding as an open question for future work, not as a refutation of the paper.",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "prompt": "help me phrase the sign convention finding in the conclusion without sounding like I'm calling the paper wrong. I want to flag it as an unresolved question and suggest the corrected version as future work, while still being clear about what the math shows",
+      "ai_output_summary": "Claude suggested framing the sign finding as 'a sign-convention inconsistency between the published formulation and the prose description' and presenting two possible corrections rather than declaring one right. It suggested ending with a constructive recommendation: 'a corrected and statistically validated re-evaluation would be a natural starting point for future work.'",
+      "verification": {
+        "actions": [
+          "Verified the proposed phrasing accurately characterises the finding -- it does not claim the paper is wrong, only that the equations and prose are inconsistent.",
+          "The two corrections listed (negate Eq. 3 or change signs in Eq. 5) are both verified to be self-consistent."
+        ],
+        "level": "plausibility-check"
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [],
+        "usefulness": "high"
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section 7 (Conclusion) of M4",
+        "usage_type": "text-revision",
+        "direct_text_reused": false
+      },
+      "reflection": "The AI was helpful in striking the right register -- scientifically honest without being aggressive. The phrase 'inconsistency between the published formulation and the prose description' accurately captures what I can claim without access to the authors' source code. I used it in the final paper."
+    }
+  ]
+}
