@@ -1,0 +1,592 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{microtype}
+
+% ---------------------------------------------------------------
+%  M4: Final IEEE Paper
+%  Nnaemeka Nnachi-Egwu -- Electronic Engineering -- HSHL
+%  HW/SW Co-Design Seminar, Prof. Dr. Achim Rettberg
+%  Topic: High-Level Synthesis with Ant Colony Optimization Scheduling
+% ---------------------------------------------------------------
+
+\begin{document}
+
+\title{High-Level Synthesis with Ant Colony Optimization Scheduling}
+
+\author{
+  \IEEEauthorblockN{Nnaemeka Nnachi-Egwu}
+  \IEEEauthorblockA{
+    Electronic Engineering\\
+    Hochschule Hamm-Lippstadt\\
+    Lippstadt, Germany\\
+    nnaemeka.nnachi-egwu@stud.hshl.de
+  }
+}
+
+\maketitle
+
+\begin{abstract}
+High-level synthesis (HLS) transforms a behavioural hardware description
+into a register-transfer-level (RTL) netlist. Scheduling, the assignment
+of operations to clock cycles, is a central and NP-complete sub-task of
+this process. Classical Force-Directed Scheduling (FDS) provides
+near-optimal results in polynomial time, but its predecessor-successor
+force term carries $O(n^{3})$ complexity and its single-pass nature
+cannot incorporate feedback from downstream synthesis steps. This paper
+presents a critical analysis and re-evaluation of an Ant Colony
+Optimization (ACO) approach to HLS scheduling proposed by Kopuri and
+Mansouri~\cite{kopuri2004aco}. Their method replaces the PS-force term
+with two experience matrices representing per-cycle and cross-cycle
+learning from complete synthesis evaluations. The resulting modified
+force equation is computed in linear time. Benchmarks on four DSP
+circuits show that the ACO-enhanced scheduler yields costs equal to or
+lower than FDS in all tested configurations. This paper details the
+algorithm, reproduces and analyses the key equations, identifies a
+sign-convention inconsistency in the published formulation, implements
+the algorithm in C++17, and evaluates its suitability for embedded
+systems applications.
+\end{abstract}
+
+\begin{IEEEkeywords}
+high-level synthesis, scheduling, ant colony optimization, force-directed
+scheduling, register-transfer level, embedded systems
+\end{IEEEkeywords}
+
+% ---------------------------------------------------------------
+\section{Introduction}
+% ---------------------------------------------------------------
+
+High-level synthesis automates the conversion of a behavioural hardware
+description, typically in a hardware description language or a C-based
+specification, into a structural netlist at the register-transfer level.
+The synthesised design must satisfy a set of architectural constraints
+while minimising hardware cost. Among the sub-tasks of HLS, scheduling
+is particularly critical: it determines which operation executes in which
+clock cycle, directly shaping the number of functional units required and
+therefore the silicon area and power consumption of the resulting
+datapath~\cite{kopuri2004aco}.
+
+Scheduling under resource constraints or latency constraints is
+NP-complete in general~\cite{paulin1987fds}. Several heuristic approaches
+have been proposed, ranging from list scheduling with priority functions
+to ILP formulations. Force-Directed Scheduling (FDS), introduced by
+Paulin and Knight in 1987, has become widely used because it minimises
+concurrency peaks directly and delivers near-optimal results in polynomial
+time~\cite{paulin1987fds}. Its $O(n^{3})$ time complexity, however,
+limits its scalability, and its single-pass nature prevents it from
+incorporating information about the downstream effects of scheduling
+decisions.
+
+Meta-heuristic techniques, including genetic algorithms~\cite{heijligers1995}
+and simulated evolution, have been applied to HLS scheduling to escape
+local optima through population-based or stochastic search. Ant Colony
+Optimization (ACO), proposed by Dorigo et al.\ in 1992~\cite{dorigo1992},
+is a multi-agent stochastic method inspired by pheromone-based
+communication in real ants. It has been applied to many NP-hard
+combinatorial problems. Kopuri and Mansouri~\cite{kopuri2004aco} proposed
+an ACO-based enhancement to FDS in which the PS-force term is replaced by
+two experience matrices that accumulate information across multiple
+synthesis evaluations.
+
+This paper provides a detailed technical analysis of the Kopuri-Mansouri
+approach. Section~II reviews the FDS baseline. Section~III presents the
+ACO-enhanced algorithm, with all equations transcribed from the primary
+source and verified against the original page images. Section~IV
+identifies a sign-convention inconsistency in the published equations and
+analyses its implications. Section~V evaluates the benchmark results and
+the method's suitability for embedded systems applications. Section~VI
+describes a C++ implementation and VHDL RTL application. Section~VII
+concludes.
+
+% ---------------------------------------------------------------
+\section{Related Scheduling Approaches}
+% ---------------------------------------------------------------
+
+HLS scheduling has attracted extensive research since the 1980s. List
+scheduling assigns operations to time-steps in topological order using
+a priority function; it runs in $O(N \log N)$ but the quality of the
+result depends entirely on the priority function, which is
+application-specific. ILP formulations guarantee optimal solutions but
+are exponential in the worst case and intractable for CDFGs with more
+than a few tens of operations. FDS~\cite{paulin1987fds} occupies a
+middle ground: polynomial time with near-optimal results.
+
+Several researchers have applied meta-heuristic techniques to overcome
+the single-pass limitation of constructive heuristics. Heijligers
+et al.~\cite{heijligers1995} used genetic algorithms and simulated
+evolution for combined scheduling and allocation; their approach
+considers multiple objectives but incurs high parameter sensitivity
+and slow convergence. Park and Kyung~\cite{park1991} proposed an
+iterative technique based on the Kernighan-Lin graph bisection approach,
+achieving near-optimal schedules at $O(N^{2}\log N)$ complexity but
+with limited generality. Integrated scheduling frameworks such as
+InSyn~\cite{sharma1994} target DSP applications by coupling scheduling
+with application-specific optimisations.
+
+At the intersection of ACO and HLS, Keinprasit and
+Chongstitvatana~\cite{keinprasit2003} proposed ``dynamic ants'' for
+HLS synthesis using a decision-path graph with dynamic niche sharing.
+Their approach does not close the full synthesis loop, and the cost
+model is less clearly defined than in~\cite{kopuri2004aco}. The Kopuri-
+Mansouri work is distinguished by its direct use of post-synthesis cost
+as the ACO reinforcement signal and its grounding in the well-understood
+FDS framework.
+
+The ACO paradigm itself has been extended far beyond the original Ant
+System (AS) of Dorigo~\cite{dorigo1992}. The Ant Colony System (ACS)
+introduces local pheromone updates and explicit exploitation-exploration
+balance. Max-Min Ant Systems bound pheromone trails to prevent
+premature convergence. None of these variants are adopted by Kopuri
+and Mansouri, whose trail update mechanism is a novel custom formulation
+for the assignment problem structure of HLS scheduling.
+
+% ---------------------------------------------------------------
+\section{Force-Directed Scheduling Baseline}
+% ---------------------------------------------------------------
+
+FDS operates on a Control-Data Flow Graph (CDFG) in which nodes are
+operations and directed edges represent data dependencies. Under a fixed
+latency constraint $\lambda$, ASAP and ALAP scheduling determine for each
+operation $i$ a \emph{time frame} $[t_{i}^{S},\, t_{i}^{L}]$ within
+which it must be scheduled. The \emph{type distribution} $q_{k}(l)$
+expresses the expected concurrency of operation type $k$ at time-step $l$,
+computed by summing the uniform scheduling probability $p_{i}(m) =
+1/(t_{i}^{L} - t_{i}^{S} + 1)$ of each unscheduled operation of type $k$.
+
+The \emph{self-force} measures the direct concurrency impact of
+scheduling operation $i$ at time-step $l$:
+\begin{equation}
+  S_{il} = \sum_{m = t_{i}^{S}}^{t_{i}^{L}}
+            q_{k}(m)\bigl(\delta_{lm} - p_{i}(m)\bigr),
+  \label{eq:selfforce}
+\end{equation}
+where $\delta_{lm}$ is the Kronecker delta. Positive self-force indicates
+increased concurrency pressure; negative self-force indicates relief.
+
+When scheduling $i$ at $l$ constrains a predecessor or successor, its
+time frame changes from $[t_{i}^{S}, t_{i}^{L}]$ to
+$[\tilde{t}_{i}^{S}, \tilde{t}_{i}^{L}]$. The \emph{PS-force} captures
+this secondary effect:
+\begin{equation}
+  PS_{il} = \frac{1}{\bar{\mu}_{i}+1}\sum_{m=\tilde{t}_{i}^{S}}^{\tilde{t}_{i}^{L}}
+              q_{k}(m)
+            - \frac{1}{\mu_{i}+1}\sum_{m=t_{i}^{S}}^{t_{i}^{L}}
+              q_{k}(m),
+  \label{eq:psforce}
+\end{equation}
+where $\mu_{i}$ and $\bar{\mu}_{i}$ are the mobility (time-frame width
+minus one) before and after the scheduling event. At each step, FDS
+selects the operation and time-step with the minimum total force $S_{il}
++ \sum PS_{il}$. The PS-force computation visits all predecessors and
+successors, yielding $O(n^{3})$ overall complexity.
+
+% ---------------------------------------------------------------
+\section{ACO-Enhanced Scheduling}
+% ---------------------------------------------------------------
+
+\subsection{Overview}
+
+Kopuri and Mansouri replace the PS-force term in FDS with two matrices
+encoding experience from previous synthesis iterations. The per-cycle
+experience matrix $M^{n}(N,\lambda)$ stores pheromone trails deposited
+by individual ants during iteration $n$. The global experience matrix
+$G(N,\lambda)$ accumulates trails across all cycles. Both are initialised
+to zero.
+
+The outer algorithm, Ant\_sched, runs $n_{\text{iter}}$ synthesis cycles.
+In each cycle, $n_{\text{ants}} = \lfloor \eta N \rfloor$ ants are
+initialised with the operations having the least self-forces as their
+first scheduled operations. Each ant independently executes procedure
+A\_FDS to produce a complete schedule, which is then passed through
+clique-partitioning resource allocation and Left-Edge register allocation
+to yield a synthesised design with a computable hardware cost. The trail
+matrix is updated from the cost result, and the global matrix is updated
+after all ants in the cycle have run. Table~\ref{tab:params} lists all
+parameters with their empirically determined values.
+
+\begin{table}[h]
+  \centering
+  \caption{Algorithm parameters~\cite{kopuri2004aco}}
+  \label{tab:params}
+  \begin{tabular}{cll}
+    \toprule
+    Parameter & Meaning & Value \\
+    \midrule
+    $\eta$ & Ant fraction / candidate fraction & $0.5$ \\
+    $\alpha$ & Self-force weight & $1$ \\
+    $\beta$ & Per-cycle trail weight & $2$ \\
+    $\gamma$ & Global trail weight & $2$ \\
+    $\rho$ & Evaporation factor & $0.35$--$0.50$ \\
+    $n_{\text{iter}}$ & Max.\ iterations & $20$ \\
+    $n_{\text{ants}}$ & Ants per iteration & $20$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Trail Update}
+
+After ant $m$ in cycle $n$ produces schedule $s$ with cost
+$\text{cost}(s)$, the per-cycle trail matrix is updated as follows:
+\begin{equation}
+  M^{n}_{ij} = M^{n}_{ij}
+    + \frac{\text{cost}(s) - \text{cost}(s^{o})}{\text{cost}(s^{o})},
+    \quad \forall (i,j) \in s,
+  \label{eq:trail}
+\end{equation}
+where $s^{o}$ is the best schedule found so far. If $\text{cost}(s) <
+\text{cost}(s^{o})$, the schedule $s$ replaces $s^{o}$.
+
+\subsection{Global Experience Update}
+
+After all ants in cycle $n$ have run, the global matrix is updated with
+evaporation:
+\begin{equation}
+  G^{n+1}_{ij} = \rho G^{n}_{ij} + M^{n}_{ij},
+    \quad \forall (i,j).
+  \label{eq:global}
+\end{equation}
+
+The evaporation factor $\rho \in (0,1)$ causes older trail information to
+decay, preventing premature convergence. Values of $\rho$ between $0.35$
+and $0.50$ produced the best empirical results~\cite{kopuri2004aco}.
+
+\subsection{Modified Force Equation}
+
+Procedure A\_FDS uses the following force equation to evaluate scheduling
+operation $i$ at time-step $l$:
+\begin{equation}
+  F_{il} = \alpha
+    \frac{S_{il}}{\displaystyle\sqrt{\frac{1}{N\lambda}
+      \sum_{(i,j)=(1,1)}^{N,\lambda} S_{ij}}}
+    - \beta M^{n}_{il}
+    - \gamma G^{n}_{il}.
+  \label{eq:force}
+\end{equation}
+
+The first term normalises the self-force by its root-mean-square over all
+$(i,j)$ pairs, ensuring that the self-force and experience terms are
+commensurate. The second and third terms subtract current-cycle and
+cross-cycle experience, respectively. All three terms are computable in
+$O(N\lambda)$ time per scheduling step, as opposed to $O(n^{3})$ for
+FDS~\cite{kopuri2004aco}. Constants $\alpha$, $\beta$, and $\gamma$ are
+determined empirically.
+
+% ---------------------------------------------------------------
+\section{Sign-Convention Analysis}
+% ---------------------------------------------------------------
+
+Close reading of~\cite{kopuri2004aco} reveals a sign-convention
+inconsistency between the prose description and the published equations.
+
+\subsection{Mathematical Derivation of the Inconsistency}
+
+When schedule $s$ is better than $s^{o}$, i.e., $\text{cost}(s) <
+\text{cost}(s^{o})$, the numerator of the increment in Eq.~\eqref{eq:trail}
+is negative, so $M^{n}_{ij}$ decreases for the operations $(i,j)$ used
+in the improved schedule. In Eq.~\eqref{eq:force}, the term $-\beta
+M^{n}_{il}$ then increases $F_{il}$, since $\beta > 0$ and $M^{n}_{il}$
+has become more negative. A\_FDS selects the operation and time-step with
+\emph{minimum} force. Consequently, scheduling decisions that contributed
+to improved synthesis results receive a higher force value, making them
+\emph{less} likely to be re-selected in the next ant's traversal.
+
+\textbf{Numerical example.} Suppose $\text{cost}(s^{o}) = 1000$ and
+$\text{cost}(s) = 900$ (a $10\%$ improvement). The trail increment from
+Eq.~\eqref{eq:trail} is $(900 - 1000)/1000 = -0.10$. With $\beta = 2$,
+the contribution to $F_{il}$ is $-2 \times (-0.10) = +0.20$, raising the
+force. If conversely the schedule worsens to $\text{cost}(s) = 1100$, the
+increment is $+0.10$ and the contribution to $F_{il}$ is $-0.20$, reducing
+the force and making the worsening decision \emph{more} attractive in the
+next step. The pheromone mechanism reinforces bad decisions and suppresses
+good ones.
+
+\subsection{Possible Interpretations}
+
+This contradicts the paper's prose: ``The trail laid by an ant is
+positive or negative depending on whether improved synthesis results are
+obtained or not.'' Mathematically, the trail increment is always negative
+for an improvement. Two consistent corrections are possible:
+\begin{enumerate}
+  \item \textbf{Negate Eq.~\eqref{eq:trail}}: change the increment to
+        $-(\text{cost}(s) - \text{cost}(s^{o}))/\text{cost}(s^{o})$,
+        yielding a positive increment for improvement.
+  \item \textbf{Change signs in Eq.~\eqref{eq:force}}: write
+        $+\beta M^{n}_{il} + \gamma G^{n}_{il}$ and select the
+        \emph{maximum} force, equivalently inverting the selection
+        criterion.
+\end{enumerate}
+
+Despite this inconsistency, the benchmark results show improvement over
+FDS, suggesting that the anti-reinforcement may inadvertently function as
+a diversification mechanism, preventing all ants from converging on the
+same FDS-like schedule. The normalised self-force term dominates
+Eq.~\eqref{eq:force} and provides the primary scheduling guidance; the
+trail terms perturb the search around the FDS solution. The C++
+implementation described in Section~VI confirms that correcting the sign
+produces faster convergence and, in some cases, lower final costs.
+Without the authors' source code, the intended behaviour cannot be
+definitively determined.
+
+% ---------------------------------------------------------------
+\section{Benchmark Evaluation and Embedded Systems Discussion}
+% ---------------------------------------------------------------
+
+\subsection{Benchmark Results}
+
+The algorithm was evaluated on four DSP benchmarks: Differential
+Equation, Elliptical Filter, Discrete Cosine Transform~1 (DCT1), and
+DCT2~\cite{kopuri2004aco}. Hardware costs were computed using the unit
+costs in Table~\ref{tab:costs}.
+
+\begin{table}[h]
+  \centering
+  \caption{Hardware unit costs~\cite{kopuri2004aco}}
+  \label{tab:costs}
+  \begin{tabular}{lc}
+    \toprule
+    Hardware Unit & Cost \\
+    \midrule
+    Single Cycle Multiplier & 250 \\
+    Single Cycle Adder/Subtractor/Comparator & 50 \\
+    Register & 15 \\
+    2-input Mux & 15 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:results} reproduces the paper's Table~4. A\_FDS matches
+or improves FDS in all eight benchmark-latency configurations. The
+largest improvements occur for DCT2 at latency~13 ($-10.3\%$) and DCT1
+at latency~14 ($-5.9\%$). No improvement is observed for the Differential
+Equation benchmark at either latency. All experiments ran in ``a few
+seconds'' on a Pentium~3 / 800\,MHz machine with 320\,MB RAM.
+
+\begin{table}[h]
+  \centering
+  \caption{Cost of best solution: FDS vs.\ A\_FDS~\cite{kopuri2004aco}}
+  \label{tab:results}
+  \begin{tabular}{llcc}
+    \toprule
+    Benchmark & Latency & FDS & A\_FDS \\
+    \midrule
+    Diff.\ Eq.\ & 4 & 875 & 875 \\
+    Diff.\ Eq.\ & 5 & 875 & 875 \\
+    Elliptical Filter & 10 & 825 & 775 \\
+    Elliptical Filter & 12 & 775 & 775 \\
+    DCT 1 & 12 & 1795 & 1730 \\
+    DCT 1 & 14 & 1795 & 1690 \\
+    DCT 2 & 13 & 1210 & 1085 \\
+    DCT 2 & 14 & 1525 & 1390 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Critical Assessment of Results}
+
+The experimental evaluation has several limitations. Each data point
+appears to represent a single run; ACO is stochastic and multiple runs
+with variance reporting would be necessary to establish statistical
+significance. No comparison is made against other meta-heuristics such
+as simulated annealing or tabu search, which are natural baselines for
+iterative HLS scheduling. The benchmarks are exclusively arithmetic-intensive
+DSP kernels with regular data dependency graphs, which may favour the
+self-force-dominated scheduling heuristic. The zero improvement on the
+Differential Equation benchmark, which has a small CDFG, suggests that
+the ACO trail does not accumulate useful signal for small problem instances.
+
+\subsection{Embedded Systems Suitability}
+
+A\_FDS is well suited to ASIC datapath synthesis for DSP applications
+such as filter cores, transform engines, and linear algebra accelerators,
+where the count-based cost model and latency-constrained scheduling model
+are appropriate. The algorithm integrates naturally into a standard HLS
+toolchain, as it requires no modification to the resource allocation or
+register allocation steps.
+
+The method is less appropriate for FPGA targets, where the cost metric
+must account for LUT packing and routing congestion rather than unit
+counts. It is also unsuitable for control-flow-heavy designs, memory-
+bandwidth-bound applications, or any scenario requiring formal timing
+guarantees, since the stochastic scheduler cannot provide worst-case
+execution time bounds. Real-time embedded systems requiring deterministic
+response require a deterministic scheduler.
+
+% ---------------------------------------------------------------
+\section{Implementation}
+% ---------------------------------------------------------------
+
+\subsection{C++ Implementation}
+
+Both FDS and A\_FDS were implemented in C++17 as a reference
+implementation accompanying this seminar work. The implementation
+follows the Ant\_sched and A\_FDS pseudocode from~\cite{kopuri2004aco}
+exactly as printed, including the as-published sign convention in
+Eq.~\eqref{eq:trail}. Key design decisions and observations:
+
+\begin{itemize}
+  \item The CDFG is represented as an adjacency list with operation
+        type, ASAP, and ALAP annotations. ASAP and ALAP are computed
+        by standard topological forward and backward traversal.
+  \item Trail matrices $M^{n}$ and $G$ are
+        \texttt{std::vector<double>} objects of size $N \times \lambda$.
+        Memory consumption is negligible for benchmarks with $N \leq
+        50$ and $\lambda \leq 20$.
+  \item The type distribution $q_{k}(l)$ is recomputed from the
+        current partial schedule at each scheduling step. Scheduled
+        operations contribute a point mass at their assigned time-step;
+        unscheduled operations contribute $p_i(m) = 1/(t_i^L -
+        t_i^S + 1)$ over their remaining time frame.
+  \item The RMS normalisation denominator in Eq.~\eqref{eq:force}
+        is computed once per A\_FDS invocation before the scheduling
+        loop begins and reused at each step.
+  \item The clique partitioning for resource allocation uses a greedy
+        compatible-operation interval colouring: operations of the same
+        type that execute in non-overlapping time intervals are assigned
+        to the same functional unit instance.
+  \item Register allocation uses the Left-Edge algorithm on variable
+        live ranges derived from the schedule; each live range is a
+        consecutive interval of time-steps during which a value must
+        be stored. Overlapping intervals require separate registers.
+  \item Multiplexer cost is computed from the number of distinct
+        values written to each functional unit input across all
+        time-steps.
+  \item Running the implementation on Differential Equation, Elliptical
+        Filter, DCT1, and DCT2 CDFGs confirms the result pattern of
+        Table~\ref{tab:results}: A\_FDS costs are equal to or lower
+        than FDS in all cases. The zero-improvement result on the
+        Differential Equation benchmark is reproduced.
+\end{itemize}
+
+The implementation makes the sign-convention issue directly observable:
+setting the increment sign in Eq.~\eqref{eq:trail} to positive (the
+corrected interpretation) causes A\_FDS to converge faster and to lower
+costs on DCT benchmarks, while the as-printed negative sign still yields
+improvement but with slower convergence. This strongly suggests that the
+original intent was the positive sign and that Eq.~\eqref{eq:trail}
+contains a typographic error.
+
+\subsection{Algorithm Complexity Summary}
+
+Table~\ref{tab:complexity} compares the per-iteration complexity of FDS
+and A\_FDS, and the total work across the outer scheduling loop.
+
+\begin{table}[h]
+  \centering
+  \caption{Complexity comparison}
+  \label{tab:complexity}
+  \begin{tabular}{lcc}
+    \toprule
+    Algorithm & Per scheduling step & Total \\
+    \midrule
+    FDS & $O(N^{3})$ & $O(N^{4})$ \\
+    A\_FDS (one ant, one iteration) & $O(N\lambda)$ & $O(N^{2}\lambda)$ \\
+    Ant\_sched full & $O(N\lambda)$ per step &
+      $O(n_{\text{iter}} \cdot n_{\text{ants}} \cdot N^{2}\lambda)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+For the benchmark parameter values ($n_{\text{iter}}=n_{\text{ants}}=20$,
+$N \leq 50$, $\lambda \leq 20$), the total work is dominated by the
+downstream synthesis tools (clique partitioning at $O(N^{2})$ and
+Left-Edge at $O(N \log N)$) called 400 times, which is approximately
+$400 \times O(N^{2}) = 400 \times 2500 = 10^{6}$ operations for $N=50$,
+consistent with the ``few seconds'' runtime claim.
+
+\subsection{VHDL RTL Application}
+
+The scheduler output defines a datapath netlist: for each time-step,
+which operation executes on which functional unit, and which values
+must be stored in registers between steps. A VHDL entity is generated
+from this schedule, with separate processes for each functional unit
+type (multipliers, adders) and a clocked register stage. The generated
+VHDL is synthesisable and structurally corresponds to the RTL level of
+the HLS output as described in~\cite{kopuri2004aco}. A sample VHDL
+entity for a two-multiplier, two-adder datapath operating under
+latency~$\lambda$ is provided in the accompanying
+\texttt{implementation/vhdl/} directory.
+
+% ---------------------------------------------------------------
+\section{Conclusion}
+% ---------------------------------------------------------------
+
+This paper has presented a detailed analysis of the ACO-enhanced HLS
+scheduler proposed by Kopuri and Mansouri~\cite{kopuri2004aco}. The
+algorithm modifies Force-Directed Scheduling by replacing the expensive
+PS-force term with two lightweight experience matrices updated from
+complete post-synthesis evaluations, reducing the per-step complexity
+from $O(n^{3})$ to $O(N\lambda)$.
+
+Benchmark results confirm that A\_FDS matches or improves FDS across all
+tested DSP circuits within 20 iterations, with the most significant gains
+(up to $10.3\%$ cost reduction) on the DCT benchmarks. A critical finding
+of this analysis is a sign-convention inconsistency between the published
+Eq.~(3) and the paper's prose: as formulated, improved scheduling
+decisions receive a higher force value, anti-reinforcing them rather than
+reinforcing them. The benchmarks nevertheless show improvement, which may
+be attributable to an inadvertent diversification effect.
+
+The method is most appropriate for ASIC datapath synthesis of arithmetic-
+intensive DSP circuits under latency constraints. Extensions to FPGA cost
+models, multi-objective optimisation, and parallel ant evaluation are
+identified as productive directions for future work. A corrected and
+statistically validated re-evaluation of the sign-convention alternatives
+would be a natural starting point for such work.
+
+\section*{Acknowledgements}
+I thank Prof.\ Dr.\ Achim Rettberg for supervising this seminar work and
+for providing the reference materials and topic. AI usage during this work
+is documented in the accompanying AI usage protocol files as required by
+the seminar protocol.
+
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{9}
+\bibitem{kopuri2004aco}
+S. Kopuri and N. Mansouri,
+``Enhancing scheduling solutions through ant colony optimization,''
+in \textit{Proc. IEEE Int. Symp. Circuits Syst. (ISCAS)},
+2004, pp. V-257--V-260.
+
+\bibitem{paulin1987fds}
+P. G. Paulin and J. P. Knight,
+``Force-directed scheduling in automatic data path synthesis,''
+in \textit{Proc. DAC}, 1987, pp. 195--202.
+
+\bibitem{dorigo1992}
+M. Dorigo,
+\textit{Optimization, Learning and Natural Algorithms},
+Ph.D. thesis, Politecnico di Milano, IT, 1992.
+
+\bibitem{heijligers1995}
+M. G. M. Heijligers, L. J. M. Cluitmans, and J. A. G. Jess,
+``High level synthesis, scheduling and allocation using genetic
+algorithms,''
+in \textit{Proc. ASP-DAC}, 1995, pp. 61--66.
+
+\bibitem{park1991}
+I. C. Park and C. M. Kyung,
+``Fast and near optimal scheduling for data path synthesis,''
+in \textit{Proc. DAC}, 1991, pp. 650--685.
+
+\bibitem{sharma1994}
+A. Sharma and R. Jain,
+``InSyn: Integrated scheduling for DSP applications,''
+in \textit{Proc. Int. Symp. High-Level Synthesis}, 1994, pp. 96--103.
+
+\bibitem{keinprasit2003}
+R. Keinprasit and P. Chongstitvatana,
+``High level synthesis by dynamic ants,''
+\textit{Int. J. Intell. Syst.}, 2003.
+\end{thebibliography}
+
+\end{document}
