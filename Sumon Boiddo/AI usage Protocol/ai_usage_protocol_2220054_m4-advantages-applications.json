@@ -1,0 +1,115 @@
+{
+  "protocol_version": "0.2",
+  "student": "Sumon Boiddo",
+  "student_id": "2220054",
+  "course": "HW/SW Co-Design Seminar",
+  "institution": "Hochschule Hamm-Lippstadt, Lippstadt, Germany",
+  "email": "sumon.boiddo@stud.hshl.de",
+  "supervisor": "Prof. Dr. Achim Rettberg",
+  "milestone": "M4: Advantages, Applications, Future Work, Conclusion",
+  "topic": "High-Level Synthesis with Game Theoretic Scheduling",
+  "exported_at": "2026-06-17T18:00:00+02:00",
+  "entries": [
+    {
+      "id": "e-p6q7r8s9",
+      "timestamp": "2026-06-15T10:00:00+02:00",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "parent_id": null,
+      "objective": "M4 required prose paragraphs instead of bullet points. I had my advantages and limitations in bullet form from M3. I needed help turning them into coherent academic paragraphs while keeping all my own ideas and not adding anything new.",
+      "prompt": "I have these advantages in bullet form: (1) each FU acts as a player, Nash equilibrium gives the power-minimising assignment, reduces switching activity; (2) no area overhead because no new hardware is added, only the assignment is changed. And this limitation: power is prioritised so latency may increase slightly. Convert these into two paragraphs of academic prose without adding any new ideas.",
+      "ai_output_summary": "Claude converted my bullet points into two paragraphs. The first paragraph described the Nash equilibrium mechanism and its effect on switching activity. The second covered the no-area-overhead advantage. The limitation was added as a final sentence in the second paragraph. No new technical claims were introduced.",
+      "verification": {
+        "level": "primary-source-check",
+        "actions": [
+          "Read the generated paragraphs against my M3 bullet list and against Murugavel and Ranganathan (2003). All claims in the paragraphs match what I had in bullets and are supported by the paper. The limitation (latency increase) is confirmed in Section VI of the paper."
+        ]
+      },
+      "evaluation": {
+        "status": "accepted",
+        "usefulness": "high",
+        "issues": []
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section I (Advantages and Limitations)",
+        "usage_type": "wording-support",
+        "direct_text_reused": false
+      },
+      "reflection": "All technical ideas and claims are mine from M1-M3. The AI only converted my bullet structure into prose format. I edited the generated paragraphs to match my voice and confirmed every factual claim against the paper before including them."
+    },
+    {
+      "id": "e-q7r8s9t0",
+      "timestamp": "2026-06-16T09:00:00+02:00",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "parent_id": "e-p6q7r8s9",
+      "objective": "I wanted the applications section to connect the power-reduction result directly to IoT and mobile device use cases. I had the connection in my notes but was not sure how to express the chain of reasoning clearly in English.",
+      "prompt": "I want to write this reasoning as one paragraph: IoT/wearables/mobile have small batteries and strict power limits, so less power means longer battery life and less heat. HLS with game theory and Nash equilibrium makes scheduling and binding systematic so power is reduced. In future, AI or ML could learn from past designs and make even smarter power decisions for larger circuits. Connect these ideas as a flowing paragraph.",
+      "ai_output_summary": "Claude connected the three ideas into a flowing paragraph. The IoT motivation and the AI future direction were joined by a bridge sentence about HLS systematising the decision process. The paragraph was slightly more formal than my note phrasing but contained no new ideas.",
+      "verification": {
+        "level": "secondary-source-check",
+        "actions": [
+          "Checked that the IoT application claim is consistent with M2 Section V (Embedded Systems Constraints and Consequences) and that the AI/ML future direction is consistent with M3 Section VI extension point 4. Both match. No new claims were introduced."
+        ]
+      },
+      "evaluation": {
+        "status": "accepted",
+        "usefulness": "medium",
+        "issues": []
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section II (Applications and Relevance)",
+        "usage_type": "wording-support",
+        "direct_text_reused": false
+      },
+      "reflection": "The application targets (IoT, mobile, wearables) and the ML future direction were already in my milestone notes. The AI made the paragraph flow better. I adjusted the wording before including it in the submission."
+    },
+    {
+      "id": "e-r8s9t0u1",
+      "timestamp": "2026-06-16T14:00:00+02:00",
+      "ai_tool": {
+        "name": "Claude",
+        "model": "claude-sonnet-4-6"
+      },
+      "parent_id": "e-q7r8s9t0",
+      "objective": "I wrote a first draft of the conclusion but it was too short and did not mention all three remaining challenges (latency, interconnect, scalability). I wanted help expanding it while keeping only my own ideas.",
+      "prompt": "My conclusion draft: 'This work showed that HLS scheduling and binding can be solved with Nash equilibrium and power is reduced. Future work needs to fix latency, interconnect, and speed for large circuits.' Can you expand this to a short academic conclusion paragraph that mentions all three future challenges clearly?",
+      "ai_output_summary": "Claude expanded the paragraph to mention: (1) the main result (scheduling and binding solved via Nash equilibrium, power reduced without area increase), (2) latency as a remaining challenge requiring co-optimisation, (3) interconnect binding as a missing model component, (4) Nash equilibrium scalability for large circuits as a computational challenge. The conclusion was three sentences long.",
+      "verification": {
+        "level": "primary-source-check",
+        "actions": [
+          "Verified each of the four points in the expanded conclusion against the paper: main result matches Tables I-III, latency issue matches Section VI Assumption 1, interconnect gap matches Section VI Assumption 4, scalability issue matches Section V complexity analysis. All confirmed."
+        ]
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "usefulness": "high",
+        "issues": [
+          "The AI wrote 'power reduced without area increase' as a single clause which I preferred to separate into two distinct points for clarity. I restructured the sentence before using it in the submission."
+        ]
+      },
+      "integration": {
+        "used_in_work": true,
+        "section": "Section IV (Conclusion)",
+        "usage_type": "wording-support",
+        "direct_text_reused": false
+      },
+      "reflection": "The three future work challenges were my own list from M3. The AI helped expand my short draft into a proper conclusion. I rewrote one sentence to separate the area and power result more clearly. The final conclusion is my own text, not a copy of the AI output."
+    }
+  ],
+  "summary": {
+    "total_entries": 3,
+    "accepted": 2,
+    "partially_accepted": 1,
+    "revised": 0,
+    "rejected": 0,
+    "used_in_submitted_work": 3,
+    "high_usefulness": 3
+  }
+}
