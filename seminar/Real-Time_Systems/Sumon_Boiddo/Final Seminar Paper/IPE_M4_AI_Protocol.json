@@ -1,0 +1,220 @@
+{
+  "document_title": "Improved Priority Exchange Server",
+  "milestone": "M4 — Final Seminar Paper",
+  "student_name": "Sumon Boiddo",
+  "student_id": "2220054",
+  "student_email": "sumon.boiddo@stud.hshl.de",
+  "programme": "BEng Electronic Engineering",
+  "institution": "Hochschule Hamm-Lippstadt (HSHL), Lippstadt, Germany",
+  "supervisor": "Prof. Stefan Henkler",
+  "ai_tool": "Claude (Anthropic)",
+  "model_version": "claude-sonnet-4-6",
+  "protocol_version": "0.2",
+  "submission_date": "2026-06-24",
+
+  "scope_note": "This protocol covers AI usage in M4 (the final seminar paper) ONLY. AI usage in M1, M2, and M3 is documented in separate protocol files. Before using any AI tool, the student studied the professor-assigned primary reference (Buttazzo, Hard Real-Time Computing Systems, Chapter 6) independently. To build a strong personal understanding, the student read and explained the source material in their own mother language (Bangla), then developed technical judgement, examples, comparisons, and critical evaluation through M1, M2, and M3. For M4, the student gave their own ideas, M1–M3 notes, and draft explanations to the LLM. The LLM's role was to help express this accumulated understanding in coherent IEEE two-column academic English, improve grammar, improve sentence structure, make wording more academic, and generate TikZ figure code. The LLM did not introduce the technical ideas. All technical content, correctness decisions, and final editorial choices were made by the student.",
+
+  "text_reuse_policy": "AI wording suggestions were not copied blindly. They were reviewed, corrected, shortened, and adapted by the student before use. Where AI-generated English wording was accepted with only minor edits after student review, this is marked honestly as direct_text_reused: true. Where AI output was used only for structure or ideas and the student rewrote the content themselves, or where AI output was rejected due to errors, this is marked direct_text_reused: false.",
+
+  "ai_role_summary": {
+    "did": [
+      "English translation of student's own ideas from M1–M3 notes",
+      "Grammar and sentence correction",
+      "Academic wording and phrasing suggestions",
+      "Section structure suggestions (reviewed and modified by student)",
+      "Simplified explanations for complex technical points",
+      "TikZ figure code generation (adjusted by student for column width)",
+      "Consistency checking of claims against student-provided reference content"
+    ],
+    "did_not_do": [
+      "Introduce new technical ideas not present in student's M1–M3 work",
+      "Choose which references to cite",
+      "Make final decisions about paper structure",
+      "Provide correct schedulability inequalities independently (student caught and corrected an AI error)",
+      "Provide verified quantitative performance claims (student rejected a fabricated statistic)"
+    ]
+  },
+
+  "entries": [
+
+    {
+      "id": "M4-001",
+      "phase": "Paper structure planning",
+      "student_prompt": "ok so I finished M1, M2, M3 and now I need to write a 5-page final paper in IEEE two-column format combining all three. Can you suggest a section structure that covers everything from the checklist?",
+      "ai_suggestion": "Claude proposed: Abstract, Introduction, Technical Background (covering M1 content), Scientific Context (M2), Critical Evaluation (M3), Application Discussion (M3), Extensions/Open Questions (M3), Conclusion, References.",
+      "student_action": "partially-accepted",
+      "student_modification": "I split Critical Evaluation from Scalability Analysis into two separate sections because the checklist explicitly asks for scalability separately, and I felt merging them would hide the scalability discussion. I ended up with 8 sections rather than Claude's 7. The section names and ordering were my own final decision.",
+      "direct_text_reused": false,
+      "direct_text_reused_note": "No prose was produced in this step — only section headings were proposed by AI. No AI wording appears in the final paper from this interaction.",
+      "ideas_from_student": true,
+      "source_sections": ["M1 entire", "M2 entire", "M3 entire", "seminar_milestone_checklist.ipynb M4 checklist"]
+    },
+
+    {
+      "id": "M4-002",
+      "phase": "Abstract writing",
+      "student_prompt": "write me an abstract for the paper. It should summarise what IPE is, what the paper covers (the technical part, comparison with other servers, critical evaluation, application discussion), and mention the main reference is Buttazzo chapter 6",
+      "ai_suggestion": "Claude produced a full abstract draft of approximately 210 words.",
+      "student_action": "partially-accepted",
+      "student_modification": "The draft was too long for IEEE conference format. I asked Claude to shorten it to under 170 words. I also removed the sentence 'IPE outperforms DPE in all realistic scenarios' because I had not made this claim in M1–M3 and it is too strong to verify. I replaced it with 'near-optimal responsiveness', which matches what Buttazzo says. The final abstract is based on the AI draft, reviewed and edited by me.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote the full abstract draft. I shortened it and removed one unverified claim. The remaining prose in the final paper is AI-assisted wording, reviewed and edited by the student.",
+      "ideas_from_student": true,
+      "source_sections": ["M1 Abstract", "M2 Abstract", "M3 Abstract"]
+    },
+
+    {
+      "id": "M4-003",
+      "phase": "Introduction section",
+      "student_prompt": "Write a short introduction. Start by saying periodic and aperiodic tasks must coexist, explain why naive solutions are bad, then introduce aperiodic servers and explain where IPE fits. End with a roadmap of the paper sections.",
+      "ai_suggestion": "Claude wrote a three-paragraph introduction following my structure prompt exactly.",
+      "student_action": "accepted-after-student-review",
+      "student_modification": "I reviewed the three paragraphs against my M1 understanding and found them accurate. I added one sentence at the end mentioning the AI usage protocol reference, as required by the checklist. The rest of the introduction text is AI-assisted wording of my own ideas from M1.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote the full three-paragraph introduction; I added one sentence after review. The introduction in the final paper is substantially AI-assisted English prose expressing my M1 ideas.",
+      "ideas_from_student": true,
+      "source_sections": ["M1 Section I (Problem Statement)"]
+    },
+
+    {
+      "id": "M4-004",
+      "phase": "Schedulability condition — AI error caught and corrected",
+      "student_prompt": "In the formal model section, write the schedulability condition and explain it",
+      "ai_suggestion": "Claude initially wrote the schedulability condition as the strict inequality $U_p < 1$.",
+      "ai_error": true,
+      "error_description": "The correct EDF schedulability condition from Buttazzo Chapter 6 and Spuri & Buttazzo (1996) is the non-strict inequality $U_p \\leq 1$ (less-than-or-equal). Under EDF, $U_p = 1$ is still schedulable — this is one of EDF's key advantages over RM. The strict inequality $U_p < 1$ misrepresents the theorem and would be a factual error in the paper.",
+      "student_action": "rejected-and-corrected",
+      "student_correction": "I caught this when cross-checking against my M1 notes and Buttazzo p. 239. I told Claude: 'That is wrong. It should be $U_p \\leq 1$, not $U_p < 1$. Under EDF a system at 100% utilisation is still schedulable. Please correct.' Claude corrected the inequality and rewrote the surrounding explanation. The corrected version is in the final paper.",
+      "direct_text_reused": false,
+      "direct_text_reused_note": "The original erroneous text was rejected. The correction was identified by the student from their own M1 knowledge. The revised explanation is AI-assisted wording of the corrected fact.",
+      "ideas_from_student": true,
+      "source_sections": ["M1 Section III (Formal Definition)", "Buttazzo 2011 Ch. 6"]
+    },
+
+    {
+      "id": "M4-005",
+      "phase": "Algorithm operating rules section",
+      "student_prompt": "describe the four operating rules of IPE: replenishment, exchange, consumption, spare-time reclaiming. Keep it concise, use paragraph headings like in my M1",
+      "ai_suggestion": "Claude wrote four short paragraphs with \\paragraph headings for each rule.",
+      "student_action": "accepted-after-student-review",
+      "student_modification": "I reviewed each paragraph against my M1 Section IV notes. I changed the phrase 'aperiodic task executes' to 'request executes immediately at the highest priority' to match my M1 wording and to make the priority aspect explicit, which I think is important. The rest of the paragraph text is AI-assisted English expressing my M1 content.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote all four rule paragraphs based on my prompt describing my M1 ideas. I made one phrase correction after review. The section is substantially AI-assisted English prose of my M1 content.",
+      "ideas_from_student": true,
+      "source_sections": ["M1 Section IV (Algorithm and Exchange/Replenishment Rules)"]
+    },
+
+    {
+      "id": "M4-006",
+      "phase": "Comparison table and pairwise comparisons",
+      "student_prompt": "I need the comparison section from M2. Prof said the comparison should explain what you trade off, not just list what each server does. Write the table (PE, DPE, EDL, TBS, IPE) with Scheduler, Responsiveness, Main limitation columns. Then write a short pairwise comparison paragraph for each server vs IPE",
+      "ai_suggestion": "Claude produced the table and four comparison paragraphs. The table had a fifth column 'Offline step required' which I had not asked for.",
+      "student_action": "partially-accepted",
+      "student_modification": "I removed the extra column — it made the table too wide for one IEEE column. I kept the four pairwise paragraphs but added one clarifying sentence to the IPE-vs-EDL paragraph because Claude's phrasing was too vague about where exactly the computational difference lies. The table content and paragraph structure are based on my M2 comparison work; Claude helped express them in clear English.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI generated the table rows and four comparison paragraphs from my M2 content. I removed one column and added one sentence. The section is substantially AI-assisted English prose of my M2 analysis.",
+      "ideas_from_student": true,
+      "source_sections": ["M2 Sections II–III", "M2 Table I"]
+    },
+
+    {
+      "id": "M4-007",
+      "phase": "Engineering trade-offs subsection",
+      "student_prompt": "Write the 4 trade-offs from M2: optimality vs practicality, runtime vs memory, performance vs flexibility, near-optimal vs simplicity. One short paragraph each.",
+      "ai_suggestion": "Claude wrote four short paragraphs, each starting with an italicised title.",
+      "student_action": "accepted-after-student-review",
+      "student_modification": "I reviewed all four paragraphs against my M2 trade-off analysis. I removed one sentence that said 'IPE is the best practical choice for embedded systems with EDF' because I had not made this claim in M2 — it was too strong a generalisation. The remaining four paragraphs correctly express my M2 trade-off analysis in academic English.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote all four trade-off paragraphs based on my M2 ideas. I removed one overstated sentence after review. The section is substantially AI-assisted English prose of my M2 analysis.",
+      "ideas_from_student": true,
+      "source_sections": ["M2 Section IV (Scientific and Engineering Trade-offs)"]
+    },
+
+    {
+      "id": "M4-008",
+      "phase": "Critical evaluation — fabricated statistic rejected, corrected prose used",
+      "student_prompt": "Write the concrete strengths and limitations sections from M3. Strengths: near-optimal response, low runtime overhead, no wasted CPU, formal schedulability. Limitations: high memory, needs static task set, needs EDF, implementation complexity.",
+      "ai_suggestion": "Claude's first draft included the sentence: 'In typical workloads IPE reduces mean aperiodic response time by approximately 30% compared to DPE.'",
+      "ai_error": true,
+      "error_description": "This percentage figure does not appear in Buttazzo Chapter 6, in Spuri & Buttazzo (1996), or anywhere in my M1–M3 work. It is a fabricated statistic that has no source. Including it would be academic dishonesty.",
+      "student_action": "rejected-and-corrected",
+      "student_correction": "I told Claude: 'That 30% figure is not in my reference. Do not invent numbers. Replace it with a qualitative statement only.' Claude revised to: 'IPE serves aperiodic requests almost as fast as the optimal EDL server and always at the highest system priority when capacity is available.' This is qualitative and matches Buttazzo. The rest of the strengths and limitations text was accepted after this correction.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "The fabricated sentence was rejected. The corrected remainder of the strengths and limitations text was reviewed and used. The section in the final paper is AI-assisted English prose of my M3 evaluation, with one erroneous sentence removed and replaced by a verified qualitative statement.",
+      "ideas_from_student": true,
+      "source_sections": ["M3 Sections I–II", "Buttazzo 2011 Ch. 6"]
+    },
+
+    {
+      "id": "M4-009",
+      "phase": "Hidden assumptions and scalability sections",
+      "student_prompt": "Write the hidden assumptions part (WCET accuracy, full preemption, implicit deadlines, single processor) and the scalability analysis (runs well in time, poorly in memory, explain why) from M3",
+      "ai_suggestion": "Claude followed my four-point assumptions list and wrote a two-paragraph scalability analysis.",
+      "student_action": "accepted-after-student-review",
+      "student_modification": "I reviewed both sections against my M3 notes. I added 'This is IPE's hard scalability limit.' as the final sentence of the scalability section to make my critical judgement explicit. I also moved the scalability content to its own numbered section (Section V) rather than leaving it inside Critical Evaluation. The rest of the text is AI-assisted English expressing my M3 analysis.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote the assumption bullet points and scalability paragraphs from my M3 content. I added one sentence and reorganised section numbering after review. The section is substantially AI-assisted English prose of my M3 analysis.",
+      "ideas_from_student": true,
+      "source_sections": ["M3 Sections III–IV"]
+    },
+
+    {
+      "id": "M4-010",
+      "phase": "Application scenarios section",
+      "student_prompt": "I need the suitable and unsuitable application scenarios from M3. Suitable: robot motor controller (harmonic periods, fixed task set, EDF, hard deadlines + soft aperiodic commands). Unsuitable: AUTOSAR ECU (fixed priority, dynamic task set, no EDF). I want two subsections with clear headings.",
+      "ai_suggestion": "Claude wrote both subsections based on my scenario descriptions from M3.",
+      "student_action": "accepted-after-student-review",
+      "student_modification": "I reviewed both subsections against my M3 Sections V and VI. I added the closing generalisation sentence at the end of the unsuitable subsection ('More generally, IPE is unsuitable for any system with...') because it was in my M3 work and I think it is important for the reader. Claude's draft had stopped after the AUTOSAR paragraph. The rest of both subsections is AI-assisted English of my M3 examples.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote both scenario subsections based on my M3 descriptions. I added one sentence after review. The section is substantially AI-assisted English prose of my M3 application analysis.",
+      "ideas_from_student": true,
+      "source_sections": ["M3 Sections V–VI"]
+    },
+
+    {
+      "id": "M4-011",
+      "phase": "Proposed extensions and conclusion",
+      "student_prompt": "Write the four proposed extensions from M3 (reduced-memory IPE, multi-core IPE, adaptive IPE, robust IPE under WCET uncertainty) as a bullet list with a short explanation each. Then write a conclusion that summarises the whole paper.",
+      "ai_suggestion": "Claude wrote the extensions bullet list and a conclusion paragraph. The conclusion said the proposed extensions 'are likely to be explored in future research.'",
+      "student_action": "partially-accepted",
+      "student_modification": "Prof's checklist says the paper must 'clearly distinguish facts, interpretation, critique, and speculation.' Predicting that extensions 'are likely to be explored' is speculation stated without evidence. I asked Claude to rewrite using conditional framing — 'would broaden IPE's applicability' — rather than a prediction. I also added a disclaimer sentence in Section VI: 'These are proposed extensions based on the analysis in this paper and are not claims about existing published solutions.' This makes the speculative nature explicit. After revision, the extensions list and conclusion are AI-assisted English of my M3 proposed extensions, reviewed and corrected by me.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI wrote the extensions list and revised conclusion text. I corrected the speculative framing and added a disclaimer sentence. The section is substantially AI-assisted English prose of my M3 proposals.",
+      "ideas_from_student": true,
+      "source_sections": ["M3 Section VII", "M1–M3 overall synthesis"]
+    },
+
+    {
+      "id": "M4-012",
+      "phase": "TikZ figures — lineage and flowchart",
+      "student_prompt": "Can you write TikZ code for two figures: (1) a simple horizontal diagram showing the lineage PE → DPE → IPE with labels, (2) an operational flowchart for the IPE server showing replenishment, exchange, consumption, and spare-time reclaiming as decision boxes",
+      "ai_suggestion": "Claude produced TikZ source code for both figures.",
+      "ai_error": true,
+      "error_description": "The flowchart used node distances that were too large, causing it to overflow the IEEE two-column format. The decision diamond text width was also too large for the diamond shape, causing incorrect rendering.",
+      "student_action": "partially-accepted",
+      "student_modification": "I adjusted node distances, reduced text width values on the diamond nodes, switched font sizes to \\scriptsize inside the flowchart boxes, and compiled repeatedly until the figure fit correctly within one IEEE column (approximately three iterations). The lineage figure needed almost no changes. The conceptual content of both figures came from my M1 understanding of the IPE model.",
+      "direct_text_reused": true,
+      "direct_text_reused_note": "AI produced the TikZ code that forms the basis of both figures. I corrected dimension parameters after testing in the actual compilation environment. The figure code in the final paper is AI-generated code, adjusted by me.",
+      "ideas_from_student": true,
+      "source_sections": ["M1 Sections III–IV (formal model and algorithm)"]
+    },
+
+    {
+      "id": "M4-013",
+      "phase": "Prompt formulation and protocol review",
+      "student_prompt": "I asked ChatGPT to help me prepare a safer and more transparent prompt for fixing the AI usage protocol, and to check whether the protocol description was consistent and honest.",
+      "ai_suggestion": "ChatGPT suggested making AI text reuse more transparent by distinguishing clearly between: (a) student ideas expressed in AI English, (b) AI wording accepted after student review, and (c) AI errors that were rejected. It also suggested making the student_action values more descriptive (e.g. 'accepted-after-student-review') rather than just 'accepted'.",
+      "student_action": "partially-accepted",
+      "student_modification": "I used this feedback only to improve the transparency and consistency of the AI usage protocol itself, not to create any technical content for the seminar paper. The technical content of the paper was not involved in this step.",
+      "direct_text_reused": false,
+      "direct_text_reused_note": "ChatGPT was used only to review the protocol wording, not to generate any content in the final paper. No ChatGPT text appears in the final seminar paper.",
+      "ideas_from_student": true,
+      "source_sections": ["AI usage protocol (this document)"]
+    }
+
+  ],
+
+  "overall_ai_contribution_summary": "The student first studied the professor-assigned primary reference (Buttazzo, Hard Real-Time Computing Systems, Chapter 6) through independent reading. To build a deep personal understanding, the student worked through the source material by reading, explaining, and translating it into their own mother language (Bangla). Technical understanding, comparison analysis, critical evaluation, examples, and proposed extensions were developed through M1, M2, and M3 before any AI tool was involved in the final paper. For M4, AI was used as a support tool for English wording, grammar, sentence structure, academic phrasing, structure suggestions, simplified explanations, TikZ figure code generation, and consistency checking. In most sections, the student provided their own M1–M3 content and ideas as input, and the AI helped express them in coherent IEEE-format English. Some AI-assisted wording was reviewed, corrected, and partially reused after student revision; these sections are marked direct_text_reused: true. Two factual AI errors were identified and corrected before any text was accepted: (1) the schedulability condition was written as a strict inequality instead of the correct non-strict form from Buttazzo — caught and corrected by the student; (2) a fabricated responsiveness percentage (30%) was invented by AI — rejected and replaced with a qualitative statement verified against the reference. The final technical content, correctness checks, structure decisions, and submission decisions were made by the student.",
+
+  "chatgpt_usage_note": "ChatGPT was used separately and only to help the student prepare a clearer and more transparent prompt for improving this AI usage protocol (see entry M4-013). ChatGPT was not used to produce any technical content in the final seminar paper."
+}
