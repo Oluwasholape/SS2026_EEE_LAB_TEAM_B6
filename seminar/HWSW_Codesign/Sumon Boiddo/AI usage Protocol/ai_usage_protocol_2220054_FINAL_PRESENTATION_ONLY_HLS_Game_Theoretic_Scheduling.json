@@ -1,0 +1,326 @@
+{
+  "protocol_version": "0.2",
+  "scope": "presentation-slides-only",
+  "student_name": "Sumon Boiddo",
+  "student_id": "2220054",
+  "course": "Electronic Engineering / High-Level Synthesis Seminar",
+  "milestone": "Final Presentation Slides",
+  "topic": "High-Level Synthesis with Game-Theoretic Scheduling: Power Optimization during Behavioral Synthesis",
+  "exported_at": "2026-06-23T01:21:54+02:00",
+  "target_artifact": {
+    "type": "presentation slides",
+    "title": "High-Level Synthesis with Game-Theoretic Scheduling",
+    "filename": "HLSGame-Theoretic-Scheduling Final(1).pptx",
+    "slide_count": 14
+  },
+  "important_scope_note": "This AI usage protocol documents AI assistance for preparing the final presentation slides only. It is not an AI usage protocol for the seminar paper. The final seminar paper was only used as the student's own source/basis to understand what the slides should contain.",
+  "basis_material_not_target": {
+    "type": "student seminar paper",
+    "filename": "M5_Seminar_Paper_Boiddo.pdf",
+    "use_in_this_protocol": "Used only as the student's existing source material for making the presentation slides. The AI usage for writing the seminar paper is not documented here."
+  },
+  "student_work_statement": "The presentation slides were prepared from the student's final seminar paper and the student's own understanding after reading the professor-mentioned/source material. AI was used sometimes to help with slide structure, shorter bullet-point wording, grammar, simple explanations, visual/example presentation ideas, consistency checking, and speaking preparation. The student reviewed and edited the AI suggestions before using them. This protocol does not claim that AI wrote the seminar paper, nor does it document the seminar paper writing process.",
+  "overall_ai_role_for_presentation": "Support tool for transforming the student's existing seminar-paper content into clear presentation slides.",
+  "not_used_for_in_this_protocol": [
+    "documenting or evaluating AI use for the seminar paper",
+    "writing the seminar paper",
+    "inventing experimental results for the presentation",
+    "creating unsupported references",
+    "replacing the student's reading, understanding, or final decision-making",
+    "submitting unreviewed AI-generated slide content"
+  ],
+  "presentation_ai_use_categories": [
+    "slide structure",
+    "bullet-point reduction",
+    "grammar and wording improvement",
+    "concept simplification",
+    "diagram/example explanation",
+    "results-slide consistency check",
+    "speaker notes and Q&A preparation",
+    "protocol documentation"
+  ],
+  "entries": [
+    {
+      "id": "p-01-slide-structure",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": null,
+      "objective": "Create a clear slide sequence from the student's existing seminar paper.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "I already made my final seminar paper from my own ideas and reading. Now help me make a clear presentation slide structure for the topic High-Level Synthesis with Game-Theoretic Scheduling.",
+      "ai_output_summary": "AI suggested a presentation order starting from HLS basics, then power optimization motivation, the scheduling and binding problem, game theory, auction-based scheduling, Nash equilibrium, methodology, power-reduction techniques, results, and conclusion.",
+      "student_input_and_manual_work": "The student used the final seminar paper as the source, selected which content was important for slides, removed details that were too long, and arranged the final slide order.",
+      "verification": {
+        "level": "presentation-consistency-check",
+        "actions": [
+          "Checked that each suggested slide matched content already present in the student's seminar paper.",
+          "Removed content not needed for the presentation.",
+          "Kept the structure suitable for oral presentation."
+        ]
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "The AI structure was useful but needed manual adaptation to the final slide count and presentation style."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "target": "presentation slides",
+        "section": "overall slide order",
+        "usage_type": "structure support",
+        "direct_text_reused": false
+      },
+      "reflection": "AI helped organize the presentation, but the selection of content and final slide order were decided by the student."
+    },
+    {
+      "id": "p-02-bullet-point-conversion",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": "p-01-slide-structure",
+      "objective": "Convert longer seminar-paper ideas into shorter slide bullet points.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Make the content shorter for slides. Keep the technical meaning, but make it easier to present.",
+      "ai_output_summary": "AI suggested shorter bullet points for topics such as HLS, scheduling, binding, power optimization, auction mechanism, Nash equilibrium, experimental results, and limitations.",
+      "student_input_and_manual_work": "The student reviewed the shortened wording, edited the slide text, and kept only the bullet points that matched the paper and the student's intended explanation.",
+      "verification": {
+        "level": "manual-review",
+        "actions": [
+          "Compared slide bullets with the final seminar paper.",
+          "Changed AI wording where it was too long, too formal, or too broad.",
+          "Kept only content that the student understood and could explain."
+        ]
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "Some AI bullets sounded too polished and had to be made more natural.",
+          "Some technical wording needed simplification for presentation."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "target": "presentation slides",
+        "section": "main slide bullet points",
+        "usage_type": "summarization and wording support",
+        "direct_text_reused": true
+      },
+      "reflection": "AI helped reduce the text length, but the student decided the final wording and slide content."
+    },
+    {
+      "id": "p-03-wording-and-grammar",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": null,
+      "objective": "Improve English wording, grammar, and clarity of the presentation slides.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Check and improve my presentation wording and grammar. Make it clear and formal, but keep it simple.",
+      "ai_output_summary": "AI helped polish sentence structure and improve clarity for slide explanations, including motivation, core problem, game-theory explanation, methodology, results, and conclusion.",
+      "student_input_and_manual_work": "The student manually accepted, rejected, or changed the polished wording before inserting it into the final slides.",
+      "verification": {
+        "level": "language-review",
+        "actions": [
+          "Read the final wording again after inserting into slides.",
+          "Removed text that sounded unnatural or too AI-generated.",
+          "Checked that improved grammar did not change the technical meaning."
+        ]
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "Some AI wording was useful directly, but some needed rewriting in the student's own style."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "target": "presentation slides",
+        "section": "wording across multiple slides",
+        "usage_type": "language polishing",
+        "direct_text_reused": true
+      },
+      "reflection": "AI was used like a writing assistant for the presentation, not as the owner of the technical content."
+    },
+    {
+      "id": "p-04-simple-explanations-for-speaking",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": null,
+      "objective": "Prepare simple explanations for difficult presentation concepts.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Explain HLS, scheduling, binding, switching activity, first-price sealed-bid auction, and Nash equilibrium in easy words so I can present the slides confidently.",
+      "ai_output_summary": "AI gave simplified explanations, for example: scheduling decides when operations run, binding decides which hardware unit executes an operation, and Nash equilibrium means a stable assignment where no unit benefits by changing alone.",
+      "student_input_and_manual_work": "The student used these explanations for understanding and speaking practice, but adapted them into personal wording during presentation preparation.",
+      "verification": {
+        "level": "concept-check",
+        "actions": [
+          "Checked simplified explanations against the slide content.",
+          "Kept explanations only if they matched the paper's technical meaning.",
+          "Avoided using explanations that the student could not personally explain."
+        ]
+      },
+      "evaluation": {
+        "status": "accepted-after-revision",
+        "issues": [
+          "Simplified examples were useful but needed to stay technically accurate."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "target": "presentation preparation",
+        "section": "speaker explanation, not separate paper content",
+        "usage_type": "oral explanation support",
+        "direct_text_reused": false
+      },
+      "reflection": "The AI output helped the student explain the slides more clearly, but the student was responsible for understanding it."
+    },
+    {
+      "id": "p-05-diagram-and-example-support",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": "p-04-simple-explanations-for-speaking",
+      "objective": "Make the presentation method easier to understand with a simple flow/example.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Give me a simple presentation-friendly example or flow to explain the game-theoretic scheduling process.",
+      "ai_output_summary": "AI suggested explaining the method as a flow: read the DFG, identify ready operations, let functional units submit power-cost bids, apply the equilibrium/auction result, schedule the winning operation, and repeat. It also helped phrase a simple bidding example for an addition operation.",
+      "student_input_and_manual_work": "The student selected the final slide version and treated the example as illustrative for explanation, not as an experimental benchmark result.",
+      "verification": {
+        "level": "presentation-consistency-check",
+        "actions": [
+          "Checked that the example stayed connected to the slide topic.",
+          "Ensured the example was not presented as a measured result.",
+          "Kept the diagram simple enough for a short presentation."
+        ]
+      },
+      "evaluation": {
+        "status": "revised",
+        "issues": [
+          "The visual/example needed to be clear but not misleading."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "target": "presentation slides",
+        "section": "methodology and auction-example slides",
+        "usage_type": "visual explanation support",
+        "direct_text_reused": true
+      },
+      "reflection": "AI helped with presentation clarity, while the final decision about the example and diagram belonged to the student."
+    },
+    {
+      "id": "p-06-results-slide-check",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": null,
+      "objective": "Check that the presentation result slide did not overstate the numerical claims.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Check my results slide for the percentages 6.3%, 13.9%, and 11.8%. Help me say them safely in the presentation.",
+      "ai_output_summary": "AI suggested presenting these numbers as benchmark-based average improvements from the cited work and not as a universal guarantee for every HLS design. It also suggested mentioning limitations such as latency increase and scalability.",
+      "student_input_and_manual_work": "The student checked the result statements against the seminar-paper source and kept the final wording short for the result slide.",
+      "verification": {
+        "level": "claim-check",
+        "actions": [
+          "Compared result percentages with the result section used for the presentation.",
+          "Avoided saying that the method always gives the same improvement.",
+          "Included the limitation that the method may have scalability and slight latency tradeoffs."
+        ]
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "Result wording had to be careful because percentages are benchmark-specific."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "target": "presentation slides",
+        "section": "experimental results and conclusion slides",
+        "usage_type": "claim checking",
+        "direct_text_reused": true
+      },
+      "reflection": "This made the presentation safer because the result slide contains the strongest technical claims."
+    },
+    {
+      "id": "p-07-speaker-notes-and-qa",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": null,
+      "objective": "Prepare for presenting the slides and answering questions.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Give me a short speaking script and possible professor questions for my presentation slides.",
+      "ai_output_summary": "AI generated short speaker-note ideas and possible Q&A for explaining HLS, why power optimization matters, how auction-based scheduling works, what Nash equilibrium means, and what the results show.",
+      "student_input_and_manual_work": "The student used the output only for practice and adapted the explanations into personal speaking style.",
+      "verification": {
+        "level": "practice-review",
+        "actions": [
+          "Matched speaker notes to the actual slide content.",
+          "Removed answers that were too complex or not relevant to the final slides.",
+          "Practiced explaining in the student's own words."
+        ]
+      },
+      "evaluation": {
+        "status": "partially-accepted",
+        "issues": [
+          "AI speaker notes were helpful for preparation but were not copied as final slide content."
+        ],
+        "usefulness": "medium"
+      },
+      "integration": {
+        "target": "presentation preparation",
+        "section": "oral presentation practice",
+        "usage_type": "speaker-note support",
+        "direct_text_reused": false
+      },
+      "reflection": "AI helped with preparation, but the actual presentation should be delivered by the student in their own words."
+    },
+    {
+      "id": "p-08-protocol-documentation",
+      "timestamp": "2026-06-23T01:21:54+02:00",
+      "parent_id": null,
+      "objective": "Create the AI usage protocol files for the presentation slides only.",
+      "ai_tool": {
+        "name": "ChatGPT",
+        "model": "GPT-5.5 Thinking / GPT-5.5"
+      },
+      "prompt": "Make the AI Usage Protocol for my presentation only. Do not make it for the seminar paper. The paper was only given so you understand that I made the presentation from my own paper and ideas.",
+      "ai_output_summary": "AI created the presentation-only AI usage protocol in JSON, BibTeX, and Jupyter Notebook formats. The protocol explicitly states that the seminar paper is not the target of this protocol.",
+      "student_input_and_manual_work": "The student clarified the scope and provided the presentation file. The student should review the final files before submitting.",
+      "verification": {
+        "level": "scope-check",
+        "actions": [
+          "Changed the protocol scope to presentation slides only.",
+          "Marked the seminar paper as basis material, not as the target artifact.",
+          "Removed wording that could sound like this protocol is for the seminar paper."
+        ]
+      },
+      "evaluation": {
+        "status": "accepted",
+        "issues": [
+          "The final protocol must be submitted only for the presentation slide task."
+        ],
+        "usefulness": "high"
+      },
+      "integration": {
+        "target": "AI usage protocol files",
+        "section": "JSON, BibTeX, and Jupyter Notebook",
+        "usage_type": "documentation",
+        "direct_text_reused": true
+      },
+      "reflection": "This entry documents the correction: the protocol is only for the presentation, while the paper is only the basis."
+    }
+  ],
+  "overall_declaration": "I confirm that this AI usage protocol is only for my final presentation slides. The slides were prepared from my own final seminar paper and my own understanding after reading the professor-mentioned/source material. AI was used sometimes as support for slide structure, shorter wording, grammar, explanation, visual/example ideas, claim checking, and speaking preparation. I reviewed and edited the AI suggestions myself and remained responsible for the final slide content and presentation."
+}
